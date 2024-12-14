@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<robot name="spider" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
+
+  <xacro:include filename="$(find spider_description)/urdf/spider_macro.xacro"/>
+  <xacro:include filename="$(find spider_description)/urdf/spider.ros2_control.xacro" />
+  <xacro:spider_ros2_control name="SpiderHardwareInterface" initial_positions_file="$(arg initial_positions_file)"/>
+ 
+
+</robot>

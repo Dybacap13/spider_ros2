@@ -1,0 +1,92 @@
+# This config file is used by ros2_control
+controller_manager:
+  ros__parameters:
+    update_rate: 100  # Hz
+
+    leg_rr_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+
+    leg_rm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+
+    leg_rf_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+
+    leg_lr_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+
+    leg_lm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+
+    leg_lf_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+leg_rr_controller:
+  ros__parameters:
+    joints:
+      - joint_coxa_rr
+      - joint_femur_rr
+      - joint_tibia_rr
+    command_interfaces:
+      []
+    state_interfaces:
+      []
+leg_rm_controller:
+  ros__parameters:
+    joints:
+      - joint_coxa_rm
+      - joint_femur_rm
+      - joint_tibia_rm
+    command_interfaces:
+      []
+    state_interfaces:
+      []
+leg_rf_controller:
+  ros__parameters:
+    joints:
+      - joint_coxa_rf
+      - joint_femur_rf
+      - joint_tibia_rf
+    command_interfaces:
+      []
+    state_interfaces:
+      []
+leg_lr_controller:
+  ros__parameters:
+    joints:
+      - joint_coxa_lr
+      - joint_femur_lr
+      - joint_tibia_lr
+    command_interfaces:
+      []
+    state_interfaces:
+      []
+leg_lm_controller:
+  ros__parameters:
+    joints:
+      - joint_coxa_lm
+      - joint_femur_lm
+      - joint_tibia_lm
+    command_interfaces:
+      []
+    state_interfaces:
+      []
+leg_lf_controller:
+  ros__parameters:
+    joints:
+      - joint_coxa_lf
+      - joint_femur_lf
+      - joint_tibia_lf
+    command_interfaces:
+      []
+    state_interfaces:
+      []

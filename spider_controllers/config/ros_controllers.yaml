@@ -1,0 +1,165 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100  # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+
+    # coxa
+    joint_coxa_lf_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_coxa_lm_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_coxa_lr_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_coxa_rf_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_coxa_rm_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_coxa_rr_controller:
+      type: position_controllers/JointGroupPositionController
+
+
+    # femur
+    joint_femur_lf_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_femur_lm_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_femur_lr_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_femur_rf_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_femur_rm_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_femur_rr_controller:
+      type: position_controllers/JointGroupPositionController
+
+
+    # tibia
+    joint_tibia_lf_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_tibia_lm_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_tibia_lr_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_tibia_rf_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_tibia_rm_controller:
+      type: position_controllers/JointGroupPositionController
+
+    joint_tibia_rr_controller:
+      type: position_controllers/JointGroupPositionController
+
+    
+
+# coxa
+joint_coxa_lf_controller:
+  ros__parameters:
+    joints:
+      - joint_coxa_lf
+
+joint_coxa_lm_controller:
+  ros__parameters:
+    joints:
+      - joint_coxa_lm
+
+joint_coxa_lr_controller:
+  ros__parameters:
+    joints:
+      - joint_coxa_lr
+
+joint_coxa_rf_controller:
+  ros__parameters:
+    joints:
+      - joint_coxa_rf
+
+joint_coxa_rm_controller:
+  ros__parameters:
+    joints:
+      - joint_coxa_rm
+
+joint_coxa_rr_controller:
+  ros__parameters:
+    joints:
+      - joint_coxa_rr
+
+
+# femur
+joint_femur_lf_controller:
+  ros__parameters:
+    joints:
+      - joint_femur_lf
+
+joint_femur_lm_controller:
+  ros__parameters:
+    joints:
+      - joint_femur_lm
+
+joint_femur_lr_controller:
+  ros__parameters:
+    joints:
+      - joint_femur_lr
+
+joint_femur_rf_controller:
+  ros__parameters:
+    joints:
+      - joint_femur_rf
+
+joint_femur_rm_controller:
+  ros__parameters:
+    joints:
+      - joint_femur_rm
+
+joint_femur_rr_controller:
+  ros__parameters:
+    joints:
+      - joint_femur_rr
+
+
+# tibia
+joint_tibia_lf_controller:
+  ros__parameters:
+    joints:
+      - joint_tibia_lf
+
+joint_tibia_lm_controller:
+  ros__parameters:
+    joints:
+      - joint_tibia_lm
+
+joint_tibia_lr_controller:
+  ros__parameters:
+    joints:
+      - joint_tibia_lr
+
+joint_tibia_rf_controller:
+  ros__parameters:
+    joints:
+      - joint_tibia_rf
+
+joint_tibia_rm_controller:
+  ros__parameters:
+    joints:
+      - joint_tibia_rm
+
+joint_tibia_rr_controller:
+  ros__parameters:
+    joints:
+      - joint_tibia_rr
+
+

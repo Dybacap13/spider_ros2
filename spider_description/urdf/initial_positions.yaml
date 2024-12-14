@@ -1,0 +1,21 @@
+# Default initial positions for spider's ros2_control fake system
+
+initial_positions:
+  joint_coxa_lf: 0
+  joint_coxa_lm: 0
+  joint_coxa_lr: 0
+  joint_coxa_rf: 0
+  joint_coxa_rm: 0
+  joint_coxa_rr: 0
+  joint_femur_lf: -0.5235987756
+  joint_femur_lm: -0.5235987756
+  joint_femur_lr: -0.5235987756
+  joint_femur_rf: 0.5235987756
+  joint_femur_rm: 0.5235987756
+  joint_femur_rr: 0.5235987756
+  joint_tibia_lf: 2.09439510239
+  joint_tibia_lm: 2.09439510239
+  joint_tibia_lr: 2.09439510239
+  joint_tibia_rf: -2.09439510239
+  joint_tibia_rm: -2.09439510239
+  joint_tibia_rr: -2.09439510239
