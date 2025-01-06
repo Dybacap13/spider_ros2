@@ -13,9 +13,11 @@
 #include "hardware_interface/handle.hpp"
 
 // ROS
+#include <spider_control/spider_control.h>
+
 #include <rclcpp/rclcpp.hpp>
 
-namespace spider_control {
+namespace spider_driver {
 
 struct InterfaceInfo {
   InterfaceInfo();
@@ -80,6 +82,7 @@ class SpiderHardwareInterface : public hardware_interface::SystemInterface {
 
  private:
   std::vector<SpiderLeg> spider_data;
+  std::shared_ptr<spider_driver::SpiderControl> spider_control;
 };
 
-}  // namespace spider_control
+}  // namespace spider_driver

@@ -1,6 +1,6 @@
-<library path="spider_control">
-  <class name="spider_control/SpiderHardwareInterface"
-         type="spider_control::SpiderHardwareInterface"
+<library path="spider_driver">
+  <class name="spider_driver/SpiderHardwareInterface"
+         type="spider_driver::SpiderHardwareInterface"
          base_class_type="hardware_interface::SystemInterface">
     <description>
       ros2_control hardware interface.

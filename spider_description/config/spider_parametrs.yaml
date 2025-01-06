@@ -1,20 +1,23 @@
-# Number of Legs
-NUMBER_OF_LEGS: 6
+spider_client_library:
+    spider_ik:
+        ros__parameters:
+            # Number of Legs
+            NUMBER_OF_LEGS: 6
 
-# Define Initial Coxa Offsets in Radians "rr", "rm", "rf", "lr", "lm", "lf"
-# IK is solved in local space currently, hence the reason right and left have same angle offsets.
-INIT_COXA_ANGLE: [!degrees 32.9052429229879, !degrees 0.0, !degrees -32.9052429229879, !degrees -32.905242922987, !degrees 0.0, !degrees 32.9052429229879]
-#_______________________________________________________________________________________________________
+            # Define Initial Coxa Offsets in Radians "rr", "rm", "rf", "lr", "lm", "lf"
+            # IK is solved in local space currently, hence the reason right and left have same angle offsets.
+            INIT_COXA_ANGLE: [ 32.9052429229879,  0.0,  -32.9052429229879,  -32.905242922987,  0.0,  32.9052429229879]
+            #_______________________________________________________________________________________________________
 
-#________________________________UPDATE_________________________________________________________________
-# Define distance in meters from coxa joint to the center "rr", "rm", "rf", "lr", "lm", "lf"
-# IK is solved in local space currently, hence the reason right and left have same distance values
-COXA_TO_CENTER_X: [-0.170, 0.0, 0.170, -0.170, 0.0, 0.170]
-COXA_TO_CENTER_Y: [-0.110, -0.1325, -0.110, 0.110, 0.1325, 0.110]
-#________________________________________________________________________________________________________
+            #________________________________UPDATE_________________________________________________________________
+            # Define distance in meters from coxa joint to the center "rr", "rm", "rf", "lr", "lm", "lf"
+            # IK is solved in local space currently, hence the reason right and left have same distance values
+            COXA_TO_CENTER_X: [-0.170, 0.0, 0.170, -0.170, 0.0, 0.170]
+            COXA_TO_CENTER_Y: [-0.110, -0.1325, -0.110, 0.110, 0.1325, 0.110]
+            # #________________________________________________________________________________________________________
 
-# Define Leg Measurements in meters
-COXA_LENGTH:   0.052
-FEMUR_LENGTH:  0.082
-TIBIA_LENGTH:  0.155
-TARSUS_LENGTH: 0.00
+            # # Define Leg Measurements in meters
+            COXA_LENGTH:   0.052
+            FEMUR_LENGTH:  0.082
+            TIBIA_LENGTH:  0.155
+            TARSUS_LENGTH: 0.00

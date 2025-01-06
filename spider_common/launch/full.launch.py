@@ -16,7 +16,8 @@ from launch.substitutions import (
     PathJoinSubstitution,
 )
 from launch.event_handlers import OnProcessStart, OnProcessExit
-
+from launch_ros.actions import ComposableNodeContainer
+from launch_ros.descriptions import ComposableNode
 from ament_index_python import get_package_share_directory
 import os
 
@@ -61,7 +62,6 @@ def generate_launch_description():
             "is not set, it enables use of a custom description.",
         )
     )
-
   declared_arguments.append(
         DeclareLaunchArgument(
             "description_file",
@@ -69,6 +69,23 @@ def generate_launch_description():
             description="URDF/XACRO description file with the robot.",
         )
     )
+
+  declared_arguments.append(
+        DeclareLaunchArgument(
+            "parametrs_package",
+            default_value="spider_description",
+            description="spider_parametrs.yaml.",
+        )
+    )
+
+  declared_arguments.append(
+        DeclareLaunchArgument(
+            "parametrs_file",
+            default_value="spider_parametrs.yaml",
+            description="spider_parametrs.yaml",
+        )
+    )
+
 
 # rviz
 
@@ -105,6 +122,11 @@ def generate_launch_description():
   controllers_file = LaunchConfiguration("controllers_file")
   launch_rviz = LaunchConfiguration("launch_rviz")
 
+  parametrs_package = LaunchConfiguration("parametrs_package")
+  parametrs_file = LaunchConfiguration("parametrs_file")
+
+
+
 # ****************************
 #  Robot description URDF    *
 # ****************************
@@ -130,7 +152,30 @@ def generate_launch_description():
         [FindPackageShare(controllers_package), "config", controllers_file]
     )
 
-  
+# ****************************
+#       Parametrs          *
+# ****************************
+
+  parametrs = PathJoinSubstitution(
+        [FindPackageShare(parametrs_package), "config", parametrs_file]
+    )
+ 
+  container_parametrs = ComposableNodeContainer(
+        name = 'spider_ik',
+        namespace = '',
+        package = 'rclcpp_components',
+        executable = 'component_container_mt',
+        composable_node_descriptions = [
+            ComposableNode(
+                package = 'spider_ik_server',
+                plugin = 'spider_ik::IkServers',
+                name = 'spider_ik', 
+                namespace = 'spider_client_library',
+                parameters = [parametrs]
+            )
+        ],
+        output = 'screen'
+    )
 
 # ****************************
 #       Nodes control        *
@@ -140,7 +185,8 @@ def generate_launch_description():
               package="controller_manager",
               executable="ros2_control_node",
               parameters=[ {'robot_description': robot_description_content},
-                          robot_controllers 
+                          robot_controllers
+                           
               ],
             emulate_tty=True,
           )
@@ -151,6 +197,9 @@ def generate_launch_description():
         executable="rviz2",
         name="rviz2_moveit",
         output="log",
+        arguments=[
+            '-d' + os.path.join(get_package_share_directory('spider_common'), 'cfg', 'rviz2.rviz')],
+
         parameters=[
             robot_description   
         ],
@@ -177,7 +226,7 @@ def generate_launch_description():
             "--controller-manager",
             "/controller_manager",
         ],
-        parameters=[{'controller-manager-timeout': 120}],
+        parameters=[{'controller-manager-timeout': 120}, ],
         emulate_tty=True,
     )
 
@@ -234,6 +283,8 @@ def generate_launch_description():
   control_node_start.append(control_node)
   control_node_start.append(rviz_node)
   control_node_start.append(delay_joint_state_broadcaster_spawner_after_ros2_control_node)
+  control_node_start.append(container_parametrs)
+  
 
 
   return LaunchDescription(declared_arguments +

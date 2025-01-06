@@ -1,7 +1,7 @@
 #include <spider_control/spider_hardware_interface.h>
 
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
-namespace spider_control {
+namespace spider_driver {
 
 hardware_interface::CallbackReturn SpiderHardwareInterface::on_init(
     const hardware_interface::HardwareInfo& hardware_info) {
@@ -30,6 +30,7 @@ hardware_interface::CallbackReturn SpiderHardwareInterface::on_init(
     spider_data[index_leg].tibia.position.state =
         initial_pos[index_leg * 3 + 2];
   }
+  // spider_control = std::make_shared<SpiderControl>();
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -133,7 +134,7 @@ InterfaceType::InterfaceType()
 SpiderLeg::SpiderLeg()
     : coxa(InterfaceType()), femur(InterfaceType()), tibia(InterfaceType()) {}
 
-}  // namespace spider_control
+}  // namespace spider_driver
 #include "pluginlib/class_list_macros.hpp"
-PLUGINLIB_EXPORT_CLASS(spider_control::SpiderHardwareInterface,
+PLUGINLIB_EXPORT_CLASS(spider_driver::SpiderHardwareInterface,
                        hardware_interface::SystemInterface)

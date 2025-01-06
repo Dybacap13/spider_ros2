@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(spider_control)
+project(spider_driver)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -15,6 +15,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
     rclcpp
     rclcpp_lifecycle
     rclcpp_components
+    spider_msgs
     )
 
 
@@ -26,15 +27,33 @@ include_directories(include)
 
 
 set(HW_ROBOT_CONTROL_CPP src/spider_hardware_interface.cpp)
-
-add_library(spider_control SHARED ${HW_ROBOT_CONTROL_CPP})
+set(ROBOT_CONTROL_CPP src/spider_control.cpp)
+#
+# control
+#
+add_library(spider_control SHARED ${ROBOT_CONTROL_CPP})
 set_target_properties(spider_control PROPERTIES VERSION
-                                                   "${${PROJECT_NAME}_VERSION}")
+                                                 "${${PROJECT_NAME}_VERSION}")
 ament_target_dependencies(spider_control ${THIS_PACKAGE_INCLUDE_DEPENDS})
-rclcpp_components_register_nodes(spider_control
-                                 "spider_control::spider_control")
 
-target_compile_definitions(spider_control
+rclcpp_components_register_nodes(spider_control
+                                 "spider_driver::spider_control")
+
+#
+# spider_hardware_interface
+#
+
+add_library(spider_driver SHARED ${HW_ROBOT_CONTROL_CPP})
+
+set_target_properties(spider_driver PROPERTIES VERSION
+                                                   "${${PROJECT_NAME}_VERSION}")
+                                                                   
+ament_target_dependencies(spider_driver ${THIS_PACKAGE_INCLUDE_DEPENDS})
+target_link_libraries(spider_driver spider_control)
+rclcpp_components_register_nodes(spider_driver
+                                 "spider_driver::spider_driver")
+
+target_compile_definitions(spider_driver
                            PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 
 pluginlib_export_plugin_description_file(hardware_interface
@@ -44,7 +63,7 @@ pluginlib_export_plugin_description_file(hardware_interface
 install(DIRECTORY include/ DESTINATION include)
 
 install(
-  TARGETS spider_control 
+  TARGETS spider_driver spider_control
   EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
@@ -55,7 +74,7 @@ install(EXPORT export_${PROJECT_NAME} DESTINATION lib/${PROJECT_NAME})
 
 # export
 ament_export_include_directories(include)
-ament_export_libraries(spider_control)
+ament_export_libraries(spider_driver spider_control)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 ament_package()
