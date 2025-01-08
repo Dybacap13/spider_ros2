@@ -26,10 +26,11 @@ class IkServers : public rclcpp::Node {
   void readRosParam(const std::string param_name, T &param_value);
 
   // servers
-  rclcpp::Service<geometry_msgs::msg::Twist>::SharedPtr service_ik;
-  void getCalculateIk(
-      const std::shared_ptr<mts_calibration::srv::Calibration::Request> request,
-      std::shared_ptr<mts_calibration::srv::Calibration::Response> response) {}
+  //   rclcpp::Service<geometry_msgs::msg::Twist>::SharedPtr service_ik;
+  //   void getCalculateIk(
+  //       const std::shared_ptr<mts_calibration::srv::Calibration::Request>
+  //       request, std::shared_ptr<mts_calibration::srv::Calibration::Response>
+  //       response) {}
 };
 
 }  // namespace spider_ik

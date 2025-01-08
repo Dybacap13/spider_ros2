@@ -1,9 +1,11 @@
 #ifndef SPIDER_CLIENT_LIBRARY_H_
 #define SPIDER_CLIENT_LIBRARY_H_
-#include <iostream.h>
 
-#include <Eigen/Core>
-#include <Eigen/LU>
+#include <math.h>
+
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/LU>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -37,9 +39,20 @@ struct Trig {
   double cosine;
 };
 
+struct RosParametrs {
+  std::vector<double> coxa_to_center_x;
+  std::vector<double> coxa_to_center_y;
+  std::vector<double> init_coxa_angle;
+  double coxa_length;
+  double femur_length;
+  double tibia_length;
+  double tarsus_length;
+  int number_of_legs;
+};
+
 class SpiderIk {
  public:
-  SpiderIk();
+  SpiderIk(RosParametrs ros_parametrs_);
   Eigen::Matrix<double, 4, 4> transformationDenaviteHartenberg(double a,
                                                                double alpha,
                                                                double d,
@@ -50,19 +63,18 @@ class SpiderIk {
                            const TransformStamped body, bool state);
 
  private:
-  TransformStamped body_current;
   std::vector<TransformStamped> foot_current;
   std::vector<JointLeg> angle_joint_leg_current;
-
+  Position getCoordinateFromTDH(Eigen::Matrix<double, 4, 4> matrix);
   Trig getSinCos(double angle_rad);
-  void calculateIK(TransformStamped body_update);
+  TransformStamped calculateDistanseOffsetBody(TransformStamped body_update,
+                                               TransformStamped body_current);
   std::vector<TransformStamped> coordFeetFromBody(TransformStamped body);
-
-  std::vector<double> COXA_TO_CENTER_X, COXA_TO_CENTER_Y;
-  std::vector<double> INIT_COXA_ANGLE;
-  std::vector<double> INIT_FOOT_POS_X, INIT_FOOT_POS_Y, INIT_FOOT_POS_Z;
-  double COXA_LENGTH, FEMUR_LENGTH, TIBIA_LENGTH, TARSUS_LENGTH;
-  int NUMBER_OF_LEGS;
+  TransformStamped calculateRotaryBodyZ(TransformStamped body_target,
+                                        TransformStamped body_current);
+  RosParametrs ros_parametrs;
+  std::vector<TransformStamped> coordFeetFromBody(TransformStamped body,
+                                                  std::vector<JointLeg> joints);
 };
 }  // namespace spider_client_library
 

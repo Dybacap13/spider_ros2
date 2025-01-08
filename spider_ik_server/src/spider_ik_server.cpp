@@ -1,6 +1,5 @@
 #include <spider_ik_server/spider_ik_server.h>
 
-
 namespace spider_ik {
 
 IkServers::IkServers(rclcpp::NodeOptions options)
@@ -21,6 +20,7 @@ void IkServers::getRosParam() {
     readRosParam("TARSUS_LENGTH", TARSUS_LENGTH);
     readRosParam("COXA_TO_CENTER_X", COXA_TO_CENTER_X);
     readRosParam("COXA_TO_CENTER_Y", COXA_TO_CENTER_Y);
+    readRosParam("INIT_COXA_ANGLE", INIT_COXA_ANGLE);
 
   } catch (const std::exception& e) {
     RCLCPP_ERROR(this->get_logger(), "Get param failed");

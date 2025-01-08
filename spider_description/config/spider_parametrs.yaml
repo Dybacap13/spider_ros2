@@ -21,3 +21,7 @@ spider_client_library:
             FEMUR_LENGTH:  0.082
             TIBIA_LENGTH:  0.155
             TARSUS_LENGTH: 0.00
+
+
+            STEP_LENGTH: 0.01
+            STEP_HEIGHT: 0.03
