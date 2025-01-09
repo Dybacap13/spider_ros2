@@ -9,6 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
+    spider_client_library   
     controller_manager
     hardware_interface
     pluginlib
@@ -49,6 +50,7 @@ set_target_properties(spider_driver PROPERTIES VERSION
                                                    "${${PROJECT_NAME}_VERSION}")
                                                                    
 ament_target_dependencies(spider_driver ${THIS_PACKAGE_INCLUDE_DEPENDS})
+
 target_link_libraries(spider_driver spider_control)
 rclcpp_components_register_nodes(spider_driver
                                  "spider_driver::spider_driver")

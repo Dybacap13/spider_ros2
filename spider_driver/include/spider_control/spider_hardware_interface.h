@@ -82,7 +82,7 @@ class SpiderHardwareInterface : public hardware_interface::SystemInterface {
 
  private:
   std::vector<SpiderLeg> spider_data;
-  std::shared_ptr<spider_driver::SpiderControl> spider_control;
+  // std::shared_ptr<spider_driver::SpiderControl> spider_control;
 };
 
 }  // namespace spider_driver

@@ -1,4 +1,6 @@
 
+#include <spider_ik.h>
+
 #include <rclcpp/rclcpp.hpp>
 #include <spider_msgs/srv/ik.hpp>
 
@@ -15,6 +17,7 @@ class IkServers : public rclcpp::Node {
 
   std::shared_ptr<std::thread> async_thread_;
   // std::shared_ptr<rclcpp::Node> spider_control_node;
+  std::shared_ptr<spider_client_library::SpiderIk> ik_solver;
 
   // parametrs
   std::vector<double> COXA_TO_CENTER_X, COXA_TO_CENTER_Y;

@@ -21,16 +21,16 @@ hardware_interface::CallbackReturn SpiderHardwareInterface::on_init(
 
   spider_data.resize(info_.joints.size() / 3);
 
-  for (int i = 0; i < initial_pos.size(); i++) {
-    int index_leg = i / 3;
+  // for (int i = 0; i < initial_pos.size(); i++) {
+  //   int index_leg = i / 3;
 
-    spider_data[index_leg].coxa.position.state = initial_pos[index_leg * 3];
-    spider_data[index_leg].femur.position.state =
-        initial_pos[index_leg * 3 + 1];
-    spider_data[index_leg].tibia.position.state =
-        initial_pos[index_leg * 3 + 2];
-  }
-  // spider_control = std::make_shared<SpiderControl>();
+  //   spider_data[index_leg].coxa.position.state = initial_pos[index_leg * 3];
+  //   spider_data[index_leg].femur.position.state =
+  //       initial_pos[index_leg * 3 + 1];
+  //   spider_data[index_leg].tibia.position.state =
+  //       initial_pos[index_leg * 3 + 2];
+  // }
+  // spider_control = std::make_shared<SpiderControl>(initial_pos);
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -101,6 +101,15 @@ hardware_interface::CallbackReturn SpiderHardwareInterface::on_deactivate(
 
 hardware_interface::return_type SpiderHardwareInterface::read(
     const rclcpp::Time& /*time*/, const rclcpp::Duration& /*period*/) {
+  // auto joints = spider_control->getJointData();
+
+  // for (int i = 0; i < joints.size(); i++) {
+  //   int index_leg = i / 3;
+  //   spider_data[index_leg].coxa.position.state = joints[index_leg * 3];
+  //   spider_data[index_leg].femur.position.state = joints[index_leg * 3 + 1];
+  //   spider_data[index_leg].tibia.position.state = joints[index_leg * 3 + 2];
+  // }
+
   return hardware_interface::return_type::OK;
 }
 hardware_interface::return_type SpiderHardwareInterface::write(
