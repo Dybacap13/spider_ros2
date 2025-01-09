@@ -7,9 +7,13 @@ namespace spider_driver {
 SpiderControl::SpiderControl(std::vector<double> initial_pose)
     : spider_control_node(
           std::make_shared<rclcpp::Node>("spider_control_node")) {
+  std::cout << "AAAA____AAAA 1" << std::endl;
   createSubscriber();
+  std::cout << "AAAA____AAAA 2" << std::endl;
   createClient();
+  std::cout << "AAAA____AAAA 3" << std::endl;
   createInterfaceClient(initial_pose);
+  std::cout << "AAAA____AAAA 4" << std::endl;
   async_thread_ =
       std::make_shared<std::thread>(&SpiderControl::spinThreadKHI, this);
 }

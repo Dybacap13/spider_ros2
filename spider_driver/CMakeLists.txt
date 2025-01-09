@@ -9,7 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
-    spider_client_library   
+    spider_imitator   
     controller_manager
     hardware_interface
     pluginlib
