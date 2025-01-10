@@ -9,6 +9,7 @@ IkServers::IkServers(rclcpp::NodeOptions options)
   RCLCPP_INFO_STREAM(this->get_logger(), "IkServers : READY");
   createService();
   getRosParam();
+  createActionClient();
   std::cout << "-" << std::endl;
   std::cout << "-" << std::endl;
   std::cout << "-" << std::endl;
@@ -20,6 +21,18 @@ IkServers::IkServers(rclcpp::NodeOptions options)
   std::cout << "-" << std::endl;
   std::cout << "-" << std::endl;
   std::cout << "-" << std::endl;
+}
+
+void IkServers::createActionClient() {
+  spider_control_action_client_ =
+      rclcpp_action::create_client<control_msgs::action::JointTrajectory>(
+          this, "/spider_control/move_by_trajectory");
+}
+
+void IkServers::resultActionClient(
+    const rclcpp_action::ClientGoalHandle<
+        control_msgs::action::JointTrajectory>::WrappedResult& result) {
+  RCLCPP_INFO_STREAM(this->get_logger(), "SUCCEEDED ACTION");
 }
 
 void IkServers::getRosParam() {
@@ -79,6 +92,24 @@ void IkServers::getCalculateIk(
   std::cout << "-" << std::endl;
   std::cout << "-" << std::endl;
   std::cout << "-" << std::endl;
+
+  // auto fake = std::make_shared<trajectory_msgs::msg::JointTrajectory>();
+  trajectory_msgs::msg::JointTrajectoryPoint fake_point;
+  std::vector<double> joints_(18, 0);
+  fake_point.positions = joints_;
+  // fake->points.emplace_back(fake_point);
+
+  auto goal_msg = control_msgs::action::JointTrajectory::Goal();
+
+  goal_msg.trajectory.points.emplace_back(fake_point);
+  auto send_goal_options = rclcpp_action::Client<
+      control_msgs::action::JointTrajectory>::SendGoalOptions();
+  send_goal_options.result_callback =
+      std::bind(&IkServers::resultActionClient, this, std::placeholders::_1);
+  auto goal_handle_future = spider_control_action_client_->async_send_goal(
+      goal_msg, send_goal_options);
+
+  RCLCPP_INFO(this->get_logger(), "Accepted new action goal");
 }
 }  // namespace spider_ik
 

@@ -14,6 +14,21 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
     rclcpp_components
     spider_msgs
     spider_client_library
+
+    angles
+    control_msgs
+    control_toolbox
+
+
+
+    
+ 
+
+    realtime_tools
+
+    lifecycle_msgs
+    trajectory_msgs
+   
     )
 
 foreach (Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
