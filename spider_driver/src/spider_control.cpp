@@ -15,6 +15,7 @@ SpiderControl::SpiderControl(std::vector<double> initial_pose)
   createClient();
   std::cout << "AAAA____AAAA 3" << std::endl;
   createInterfaceClient(initial_pose);
+  createAction();
   std::cout << "AAAA____AAAA 4" << std::endl;
   async_thread_ =
       std::make_shared<std::thread>(&SpiderControl::spinThreadKHI, this);
