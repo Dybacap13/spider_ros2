@@ -105,6 +105,11 @@ void SpiderControl::executeTrajectory(
   auto result = std::make_shared<JointTrajectoryMsg::Result>();
   try {
     RCLCPP_INFO_STREAM(spider_control_node->get_logger(), "Execute trajectory");
+    auto goal = goal_handle->get_goal();
+    for (size_t index = 0; index < goal->trajectory.points.size(); index++) {
+      spider_interface->writeJointCommandPosition(
+          goal->trajectory.points[index].positions);
+    }
 
     goal_handle->succeed(result);
 
