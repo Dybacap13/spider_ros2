@@ -165,12 +165,15 @@ def generate_launch_description():
         namespace = '',
         package = 'rclcpp_components',
         executable = 'component_container_mt',
+        emulate_tty = True,
+       
         composable_node_descriptions = [
             ComposableNode(
                 package = 'spider_ik_server',
                 plugin = 'spider_ik::IkServers',
                 name = 'spider_ik', 
                 namespace = 'spider_client_library',
+                extra_arguments = [{"use_intra_process_comms": True}],
                 parameters = [parametrs]
             )
         ],

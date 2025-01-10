@@ -1,13 +1,14 @@
 
 #include <spider_client_imitation.h>
 #include <spider_client_interface.h>
-#include <control_msgs/action/joint_trajectory.hpp>
 
 #include <action_msgs/msg/goal_status_array.hpp>
 #include <action_msgs/srv/cancel_goal.hpp>
+#include <control_msgs/action/joint_trajectory.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
+#include <spider_msgs/msg/joints.hpp>
 #include <spider_msgs/srv/ik.hpp>
 using namespace spider_client_library;
 namespace spider_driver {
@@ -23,19 +24,10 @@ class SpiderControl {
 
  private:
   void spinThreadKHI();
-  void getRosParam();
-  void createService();
-  void createSubscriber();
-  void createClient();
   void createAction();
   void createInterfaceClient(std::vector<double> initial_pose);
 
   std::shared_ptr<rclcpp::Node> spider_control_node;
-
-  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr twist_sub;
-  void twistCallback(const geometry_msgs::msg::Twist::SharedPtr msg);
-
-  rclcpp::Client<spider_msgs::srv::IK>::SharedPtr ik_calculator_client;
 
   std::shared_ptr<spider_client_library::SpiderClientInterface>
       spider_interface;

@@ -2,6 +2,7 @@
 #include <spider_ik.h>
 
 #include <rclcpp/rclcpp.hpp>
+#include <spider_msgs/msg/joints.hpp>
 #include <spider_msgs/srv/ik.hpp>
 
 namespace spider_ik {
@@ -29,11 +30,10 @@ class IkServers : public rclcpp::Node {
   void readRosParam(const std::string param_name, T &param_value);
 
   // servers
-  //   rclcpp::Service<geometry_msgs::msg::Twist>::SharedPtr service_ik;
-  //   void getCalculateIk(
-  //       const std::shared_ptr<mts_calibration::srv::Calibration::Request>
-  //       request, std::shared_ptr<mts_calibration::srv::Calibration::Response>
-  //       response) {}
+  rclcpp::Service<spider_msgs::srv::IK>::SharedPtr service_ik;
+  void getCalculateIk(
+      const std::shared_ptr<spider_msgs::srv::IK::Request> request,
+      std::shared_ptr<spider_msgs::srv::IK::Response> response);
 };
 
 }  // namespace spider_ik

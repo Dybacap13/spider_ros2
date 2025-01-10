@@ -7,8 +7,19 @@ IkServers::IkServers(rclcpp::NodeOptions options)
            options.allow_undeclared_parameters(true)
                .automatically_declare_parameters_from_overrides(true)) {
   RCLCPP_INFO_STREAM(this->get_logger(), "IkServers : READY");
-
+  createService();
   getRosParam();
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "END" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
 }
 
 void IkServers::getRosParam() {
@@ -37,12 +48,38 @@ void IkServers::readRosParam(const std::string param_name, T& param_value) {
   }
 }
 
-// void IkServers::createService() {
-//   service_ik = create_service<geometry_msgs::msg::Twist>(
-//       "spider_twist", std::bind(&IkServers::getPosErrorCallback, this,
-//                                 std::placeholders::_1,
-//                                 std::placeholders::_2));
-// }
+void IkServers::createService() {
+  service_ik = create_service<spider_msgs::srv::IK>(
+      "spider/ik_calculator",
+      std::bind(&IkServers::getCalculateIk, this, std::placeholders::_1,
+                std::placeholders::_2));
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "SERVIS" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+}
+void IkServers::getCalculateIk(
+    const std::shared_ptr<spider_msgs::srv::IK::Request> request,
+    std::shared_ptr<spider_msgs::srv::IK::Response> response) {
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "request" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+  std::cout << "-" << std::endl;
+}
 }  // namespace spider_ik
 
 #include "rclcpp_components/register_node_macro.hpp"
