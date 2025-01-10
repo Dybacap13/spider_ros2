@@ -47,4 +47,33 @@ struct RosParametrs {
   double tarsus_length;
   int number_of_legs;
 };
+
+struct TimeJointTrajectory {
+  std::int32_t sec;
+  std::uint32_t nanosec;
+};
+struct HeaderJointTrajectory {
+  TimeJointTrajectory stamp;
+  std::string frame_id;
+};
+
+struct DurationJoint {
+  std::int32_t sec;
+  std::uint32_t nanosec;
+};
+
+struct JointTrajectoryPoint {
+  std::vector<double> positions;
+  std::vector<double> velocities;
+  std::vector<double> accelerations;
+  std::vector<double> effort;
+  DurationJoint time_from_start;
+};
+
+struct JointTrajectory {
+  HeaderJointTrajectory header;
+  std::vector<std::string> joint_names;
+  std::vector<JointTrajectoryPoint> points;
+};
+
 }  // namespace spider_client_library

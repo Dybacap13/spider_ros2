@@ -17,6 +17,8 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
     rclcpp_lifecycle
     rclcpp_components
     spider_msgs
+    trajectory_msgs
+    control_msgs
     )
 
 
