@@ -1,22 +1,17 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>spider_client_library</name>
+  <name>spider_imitator</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="1q2s3c4g@bk.ru">dybacap13</maintainer>
+  <maintainer email="user@todo.todo">user</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <build_depend>eigen3_cmake_module</build_depend>
-  <build_depend>Eigen3</build_depend>
+  <build_depend>spider_client_library</build_depend>
 
-  <build_export_depend>eigen3_cmake_module</build_export_depend>
-  <build_export_depend>Eigen3</build_export_depend>
-
-      
-    
+  <build_export_depend>spider_client_library</build_export_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

@@ -1,5 +1,5 @@
-float64  joints
+geometry_msgs/Twist offset
 ---
 bool success
 string message
-float64  target_joints
+

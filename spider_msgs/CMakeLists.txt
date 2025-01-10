@@ -7,7 +7,7 @@ find_package(geometry_msgs REQUIRED)
 rosidl_generate_interfaces(
   ${PROJECT_NAME}
   "srv/IK.srv"
-  "msg/ControlModeSystem.msg"
+  "msg/Joints.msg"
 
 
   DEPENDENCIES
