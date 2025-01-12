@@ -32,6 +32,11 @@ struct JointLeg {
   double tibia;
 };
 
+struct SpiderData {
+  std::vector<std::string> names;
+  std::vector<JointLeg> legs;
+};
+
 struct Trig {
   double sine;
   double cosine;

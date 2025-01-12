@@ -22,6 +22,7 @@ include_directories(include)
 
 set (SPIDER_CLIENT_LIBRARY_CPP
   src/spider_ik.cpp
+  src/spider_convent_trajectory.cpp
 )
 
 #
