@@ -57,7 +57,7 @@ void IkServers::readRosParam(const std::string param_name, T& param_value) {
 
 void IkServers::createService() {
   service_ik = create_service<spider_msgs::srv::IK>(
-      "spider/ik_calculator",
+      "spider/ik_calculator_relative_coxa",
       std::bind(&IkServers::getCalculateIk, this, std::placeholders::_1,
                 std::placeholders::_2));
 }
@@ -79,15 +79,10 @@ void IkServers::getCalculateIk(
 
   auto joint_leg = conventer->conventFromMapJontsToLegJoints(joint_with_names);
   auto spider_data = ik_solver->getJointLeg(offset, joint_leg);
-  
+
   auto points = conventer->conventFromJointsLegsToTragectoryMsg(
       spider_data, joint_with_names, joint_current->name);
-  std::cout << "+++++++ POINTS +++++" << std::endl;
-  for (int i = 0; i < points.points.size(); i++) {
-    for (int r = 0; r < points.points[i].positions.size(); r++) {
-      std::cout << points.points[i].positions[r] << std::endl;
-    }
-  }
+
   auto goal_msg = control_msgs::action::JointTrajectory::Goal();
   for (size_t index = 0; index < points.points.size(); index++) {
     trajectory_msgs::msg::JointTrajectoryPoint point_tj;

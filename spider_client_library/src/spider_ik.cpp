@@ -101,16 +101,11 @@ std::vector<TransformStamped> SpiderIk::coordFeetFromCoxa(
     std::vector<JointLeg> joints) {
   // "rr", "rm", "rf", "lr", "lm", "lf"
   std::vector<TransformStamped> coord_feet_target;
-  std::cout << " ---- coordFeetFromCoxa ---" << std::endl;
+
   for (size_t index_leg = 0; index_leg < ros_parametrs.number_of_legs;
        index_leg++) {
-    std::cout << " leg = " << index_leg << std::endl;
-    std::cout << " " << std::endl;
     TransformStamped foot;
-    std::cout << " coxa = " << joints[index_leg].coxa << std::endl;
-    std::cout << " femur= " << joints[index_leg].femur << std::endl;
-    std::cout << " tibia = " << joints[index_leg].tibia << std::endl;
-    std::cout << " " << std::endl;
+
     auto coxa_femur = transformationDenaviteHartenberg(
         ros_parametrs.coxa_length, PI / 2, 0, joints[index_leg].coxa);
 
@@ -122,35 +117,11 @@ std::vector<TransformStamped> SpiderIk::coordFeetFromCoxa(
 
     auto coxa_foot = coxa_femur * femur_tibia * tibia_foot;
 
-    std::cout << " coxa_foot.x = " << coxa_foot(12) << std::endl;
-    std::cout << " coxa_foot.y = " << coxa_foot(13) << std::endl;
-    std::cout << " coxa_foot.z = " << coxa_foot(14) << std::endl;
-    std::cout << " " << std::endl;
-
-    std::cout << " coxa_femur.x = " << coxa_femur(12) << std::endl;
-    std::cout << " coxa_femur.y = " << coxa_femur(13) << std::endl;
-    std::cout << " coxa_femur.z = " << coxa_femur(14) << std::endl;
-    std::cout << " " << std::endl;
-
-    std::cout << " femur_tibia.x = " << femur_tibia(12) << std::endl;
-    std::cout << " femur_tibia.y = " << femur_tibia(13) << std::endl;
-    std::cout << " femur_tibia.z = " << femur_tibia(14) << std::endl;
-    std::cout << " " << std::endl;
-
-    std::cout << " tibia_foot.x = " << tibia_foot(12) << std::endl;
-    std::cout << " tibia_foot.y = " << tibia_foot(13) << std::endl;
-    std::cout << " tibia_foot.z = " << tibia_foot(14) << std::endl;
-    std::cout << " " << std::endl;
-
     foot.position = getCoordinateFromTDH(coxa_foot);
-    std::cout << " foot.position.x = " << foot.position.x << std::endl;
-    std::cout << " foot.position.y = " << foot.position.y << std::endl;
-    std::cout << " foot.position.z = " << foot.position.z << std::endl;
-    std::cout << " " << std::endl;
+
     coord_feet_target.emplace_back(foot);
   }
-  std::cout << " ---- coordFeetFromCoxa ---" << std::endl;
-  std::cout << " ----  ---" << std::endl;
+
   return coord_feet_target;
 }
 
@@ -179,8 +150,15 @@ SpiderData SpiderIk::ikCalculeterOwn(
         sqrt(pow(leg.position.x, 2) + pow(leg.position.y, 2)) -
         ros_parametrs.coxa_length;
 
+    if (std::abs(femur_to_tarsus) >
+        (ros_parametrs.femur_length + ros_parametrs.tibia_length)) {
+      std::cout << "IK Solver cannot solve a foot position that is not within "
+                   "leg reach!!!"
+                << std::endl;
+
+      break;
+    }
     auto eee = sqrt(pow(femur_to_tarsus, 2) + pow(leg.position.z, 2));
-    std::cout << "eee = " << eee << std::endl;
 
     auto q0 = atan2(leg.position.y, leg.position.x);
 
@@ -199,11 +177,6 @@ SpiderData SpiderIk::ikCalculeterOwn(
     joint_leg.tibia = q2;
     joint_leg.name = names_leg_ik[index];
     index++;
-    std::cout << "----" << std::endl;
-    std::cout << "coxa = " << q0 << std::endl;
-    std::cout << "femur = " << q1 << std::endl;
-    std::cout << "tibia = " << q2 << std::endl;
-    std::cout << "----" << std::endl;
     spider_result.legs.emplace_back(joint_leg);
   }
   return spider_result;
@@ -322,11 +295,7 @@ std::vector<spider_client_library::SpiderData> SpiderIk::getJointLeg(
     TransformStamped offset,
     std::vector<spider_client_library::JointLeg> joints) {
   std::vector<spider_client_library::SpiderData> spider_data;
-
-  // TransformStamped body_target = getTargetBodyFromOffset(body_current,
-  // offset); auto body_new = calculateRotaryBodyZ(body_target, body_current);
   auto new_feet = coordFeetFromCoxa(joints);
-  std::cout << " NEW POSE !!!" << std::endl;
   for (int i = 0; i < new_feet.size(); i++) {
     new_feet[i].position.x += offset.position.x;
     new_feet[i].position.y += offset.position.y;
@@ -338,14 +307,8 @@ std::vector<spider_client_library::SpiderData> SpiderIk::getJointLeg(
     std::cout << new_feet[i].position.x << std::endl;
   }
 
-  std::cout << " NEW POSE !!!" << std::endl;
-
   auto ik = ikCalculeterOwn(new_feet);
   spider_data.emplace_back(ik);
-  // auto joints_ik = IK(new_feet, body_new, true);
-  // body_current = body_new;
-  // std::vector<SpiderData> spider_data;
-  // spider_data.emplace_back(joints_ik);
   return spider_data;
 }
 
