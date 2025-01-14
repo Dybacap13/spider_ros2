@@ -42,7 +42,7 @@ struct Trig {
   double cosine;
 };
 
-struct RosParametrs {
+struct IkParametrs {
   std::vector<double> coxa_to_center_x;
   std::vector<double> coxa_to_center_y;
   std::vector<double> init_coxa_angle;
@@ -79,6 +79,12 @@ struct JointTrajectory {
   HeaderJointTrajectory header;
   std::vector<std::string> joint_names;
   std::vector<JointTrajectoryPoint> points;
+};
+
+struct GaitParametrs {
+  double step_lenght;
+  double step_height;
+  int number_points;
 };
 
 }  // namespace spider_client_library

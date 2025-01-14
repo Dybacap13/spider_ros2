@@ -16,7 +16,7 @@ std::vector<std::string> names_leg_ik = {"rr", "rm", "rf", "lr", "lm", "lf"};
 static const double PI = atan(1.0) * 4.0;
 class SpiderIk {
  public:
-  SpiderIk(RosParametrs ros_parametrs_);
+  SpiderIk(IkParametrs ros_parametrs_);
   Eigen::Matrix<double, 4, 4> transformationDenaviteHartenberg(double a,
                                                                double alpha,
                                                                double d,
@@ -47,7 +47,7 @@ class SpiderIk {
   std::vector<TransformStamped> coordFeetFromBody(TransformStamped body);
   TransformStamped calculateRotaryBodyZ(TransformStamped body_target,
                                         TransformStamped body_current);
-  RosParametrs ros_parametrs;
+  IkParametrs ik_parametrs;
   std::vector<TransformStamped> coordFeetFromBody(TransformStamped body,
                                                   std::vector<JointLeg> joints);
 

@@ -60,7 +60,7 @@ class IkServers : public rclcpp::Node {
   int NUMBER_OF_LEGS;
   template <typename T>
   void readRosParam(const std::string param_name, T& param_value);
-  spider_client_library::RosParametrs ros_param;
+  spider_client_library::IkParametrs ik_param;
 
   // servers
   rclcpp::Service<spider_msgs::srv::IK>::SharedPtr service_ik;

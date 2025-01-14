@@ -16,8 +16,8 @@ Eigen::Matrix<double, 4, 4> SpiderIk::transformationDenaviteHartenberg(
   return result;
 }
 
-SpiderIk::SpiderIk(RosParametrs ros_parametrs_) {
-  ros_parametrs = ros_parametrs_;
+SpiderIk::SpiderIk(IkParametrs ros_parametrs_) {
+  ik_parametrs = ros_parametrs_;
   body_current.orientation.pitch = 0;
   body_current.orientation.roll = 0;
   body_current.orientation.yaw = 0;
@@ -66,23 +66,23 @@ std::vector<TransformStamped> SpiderIk::coordFeetFromBody(
   // "rr", "rm", "rf", "lr", "lm", "lf"
   std::vector<TransformStamped> coord_feet_target;
 
-  for (size_t index_leg = 0; index_leg < ros_parametrs.number_of_legs;
+  for (size_t index_leg = 0; index_leg < ik_parametrs.number_of_legs;
        index_leg++) {
     TransformStamped foot;
-    auto coxa_z = sqrt(pow(ros_parametrs.coxa_to_center_x[index_leg], 2) +
-                       pow(ros_parametrs.coxa_to_center_y[index_leg], 2));
-    auto tetta_one = atan2(ros_parametrs.coxa_to_center_x[index_leg],
-                           ros_parametrs.coxa_to_center_y[index_leg]);
+    auto coxa_z = sqrt(pow(ik_parametrs.coxa_to_center_x[index_leg], 2) +
+                       pow(ik_parametrs.coxa_to_center_y[index_leg], 2));
+    auto tetta_one = atan2(ik_parametrs.coxa_to_center_x[index_leg],
+                           ik_parametrs.coxa_to_center_y[index_leg]);
     auto body_coxa = transformationDenaviteHartenberg(coxa_z, 0, 0, tetta_one);
 
     auto coxa_femur = transformationDenaviteHartenberg(
-        ros_parametrs.coxa_length, PI / 2, 0, joints[index_leg].coxa);
+        ik_parametrs.coxa_length, PI / 2, 0, joints[index_leg].coxa);
 
     auto femur_tibia = transformationDenaviteHartenberg(
-        ros_parametrs.femur_length, 0, 0, joints[index_leg].femur);
+        ik_parametrs.femur_length, 0, 0, joints[index_leg].femur);
 
     auto tibia_foot = transformationDenaviteHartenberg(
-        ros_parametrs.tibia_length, 0, 0, joints[index_leg].tibia);
+        ik_parametrs.tibia_length, 0, 0, joints[index_leg].tibia);
 
     auto body_foot = body_coxa * coxa_femur * femur_tibia * tibia_foot;
 
@@ -102,18 +102,18 @@ std::vector<TransformStamped> SpiderIk::coordFeetFromCoxa(
   // "rr", "rm", "rf", "lr", "lm", "lf"
   std::vector<TransformStamped> coord_feet_target;
 
-  for (size_t index_leg = 0; index_leg < ros_parametrs.number_of_legs;
+  for (size_t index_leg = 0; index_leg < ik_parametrs.number_of_legs;
        index_leg++) {
     TransformStamped foot;
 
     auto coxa_femur = transformationDenaviteHartenberg(
-        ros_parametrs.coxa_length, PI / 2, 0, joints[index_leg].coxa);
+        ik_parametrs.coxa_length, PI / 2, 0, joints[index_leg].coxa);
 
     auto femur_tibia = transformationDenaviteHartenberg(
-        ros_parametrs.femur_length, 0, 0, joints[index_leg].femur);
+        ik_parametrs.femur_length, 0, 0, joints[index_leg].femur);
 
     auto tibia_foot = transformationDenaviteHartenberg(
-        ros_parametrs.tibia_length, 0, 0, joints[index_leg].tibia);
+        ik_parametrs.tibia_length, 0, 0, joints[index_leg].tibia);
 
     auto coxa_foot = coxa_femur * femur_tibia * tibia_foot;
 
@@ -148,10 +148,10 @@ SpiderData SpiderIk::ikCalculeterOwn(
     JointLeg joint_leg;
     auto femur_to_tarsus =
         sqrt(pow(leg.position.x, 2) + pow(leg.position.y, 2)) -
-        ros_parametrs.coxa_length;
+        ik_parametrs.coxa_length;
 
     if (std::abs(femur_to_tarsus) >
-        (ros_parametrs.femur_length + ros_parametrs.tibia_length)) {
+        (ik_parametrs.femur_length + ik_parametrs.tibia_length)) {
       std::cout << "IK Solver cannot solve a foot position that is not within "
                    "leg reach!!!"
                 << std::endl;
@@ -162,16 +162,15 @@ SpiderData SpiderIk::ikCalculeterOwn(
 
     auto q0 = atan2(leg.position.y, leg.position.x);
 
-    auto q1 = acos((pow(ros_parametrs.femur_length, 2) + pow(eee, 2) -
-                    pow(ros_parametrs.tibia_length, 2)) /
-                   (2 * ros_parametrs.femur_length * eee)) +
+    auto q1 = acos((pow(ik_parametrs.femur_length, 2) + pow(eee, 2) -
+                    pow(ik_parametrs.tibia_length, 2)) /
+                   (2 * ik_parametrs.femur_length * eee)) +
               atan2(leg.position.z, femur_to_tarsus);
 
-    auto q2 =
-        -M_PI +
-        acos((pow(ros_parametrs.femur_length, 2) +
-              pow(ros_parametrs.tibia_length, 2) - pow(eee, 2)) /
-             (2 * ros_parametrs.femur_length * ros_parametrs.tibia_length));
+    auto q2 = -M_PI +
+              acos((pow(ik_parametrs.femur_length, 2) +
+                    pow(ik_parametrs.tibia_length, 2) - pow(eee, 2)) /
+                   (2 * ik_parametrs.femur_length * ik_parametrs.tibia_length));
     joint_leg.coxa = q0;
     joint_leg.femur = q1;
     joint_leg.tibia = q2;
@@ -186,7 +185,7 @@ SpiderData SpiderIk::IK(const std::vector<TransformStamped> feet,
                         const TransformStamped body, bool state) {
   SpiderData result;
   double sign = -1.0;
-  for (int leg_index = 0; leg_index < ros_parametrs.number_of_legs;
+  for (int leg_index = 0; leg_index < ik_parametrs.number_of_legs;
        leg_index++) {
     JointLeg joint_leg;
     if (leg_index <= 2) {
@@ -204,14 +203,14 @@ SpiderData SpiderIk::IK(const std::vector<TransformStamped> feet,
     // Calculating totals from the feet to center of the body
     double cpr_x = feet[leg_index].position.x + body.position.x -
                    feet[leg_index].position.x -
-                   ros_parametrs.coxa_to_center_x[leg_index];
+                   ik_parametrs.coxa_to_center_x[leg_index];
 
     double cpr_y = feet[leg_index].position.y +
                    sign * (body.position.y + feet[leg_index].position.y +
-                           ros_parametrs.coxa_to_center_y[leg_index]);
+                           ik_parametrs.coxa_to_center_y[leg_index]);
 
     double cpr_z = feet[leg_index].position.z + body.position.z +
-                   ros_parametrs.tarsus_length - feet[leg_index].position.z;
+                   ik_parametrs.tarsus_length - feet[leg_index].position.z;
 
     // Calculation of angular matrix of body (Tait-Bryan angles Z, Y, X)
     // http://en.wikipedia.org/wiki/Euler_angles
@@ -237,7 +236,7 @@ SpiderData SpiderIk::IK(const std::vector<TransformStamped> feet,
         feet[leg_index].position.y +
         sign * (body.position.y - body_pos_y + feet[leg_index].position.y);
     double feet_pos_z = feet[leg_index].position.z -
-                        ros_parametrs.tarsus_length + body.position.z -
+                        ik_parametrs.tarsus_length + body.position.z -
                         body_pos_z - feet[leg_index].position.z;
     if (leg_index == 0) {
       // std::cout <<"END X = "<< feet_pos_x<< std::endl;
@@ -246,10 +245,10 @@ SpiderData SpiderIk::IK(const std::vector<TransformStamped> feet,
 
     // Length between the Root and Foot Position ...Pythagorean theorem
     double femur_to_tarsus = sqrt(pow(feet_pos_x, 2) + pow(feet_pos_y, 2)) -
-                             ros_parametrs.coxa_length;
+                             ik_parametrs.coxa_length;
 
     if (std::abs(femur_to_tarsus) >
-        (ros_parametrs.femur_length + ros_parametrs.tibia_length)) {
+        (ik_parametrs.femur_length + ik_parametrs.tibia_length)) {
       std::cout << "IK Solver cannot solve a foot position that is not within "
                    "leg reach!!!"
                 << std::endl;
@@ -259,11 +258,11 @@ SpiderData SpiderIk::IK(const std::vector<TransformStamped> feet,
 
     // Length of the sides of the triangle formed by the femur, tibia and tarsus
     // joints.
-    double side_a = ros_parametrs.femur_length;
-    double side_a_sqr = pow(ros_parametrs.femur_length, 2);
+    double side_a = ik_parametrs.femur_length;
+    double side_a_sqr = pow(ik_parametrs.femur_length, 2);
 
-    double side_b = ros_parametrs.tibia_length;
-    double side_b_sqr = pow(ros_parametrs.tibia_length, 2);
+    double side_b = ik_parametrs.tibia_length;
+    double side_b_sqr = pow(ik_parametrs.tibia_length, 2);
 
     double side_c = sqrt(pow(femur_to_tarsus, 2) + pow(feet_pos_z, 2));
     double side_c_sqr = pow(side_c, 2);
@@ -281,8 +280,8 @@ SpiderData SpiderIk::IK(const std::vector<TransformStamped> feet,
 
     // Resulting joint angles in radians.
 
-    joint_leg.coxa = atan2(feet_pos_x, feet_pos_y) +
-                     ros_parametrs.init_coxa_angle[leg_index];
+    joint_leg.coxa =
+        atan2(feet_pos_x, feet_pos_y) + ik_parametrs.init_coxa_angle[leg_index];
     joint_leg.femur = (PI / 2) - (theta + angle_b);
 
     joint_leg.tibia = (PI)-angle_c;

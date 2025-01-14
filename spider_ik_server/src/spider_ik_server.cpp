@@ -12,7 +12,7 @@ IkServers::IkServers(rclcpp::NodeOptions options)
   createActionClient();
   createSubscriber();
 
-  ik_solver = std::make_shared<spider_client_library::SpiderIk>(ros_param);
+  ik_solver = std::make_shared<spider_client_library::SpiderIk>(ik_param);
   conventer =
       std::make_shared<spider_client_library::SpiderConventTrajectory>();
 }
@@ -31,14 +31,14 @@ void IkServers::resultActionClient(
 
 void IkServers::getRosParam() {
   try {
-    readRosParam("NUMBER_OF_LEGS", ros_param.number_of_legs);
-    readRosParam("COXA_LENGTH", ros_param.coxa_length);
-    readRosParam("FEMUR_LENGTH", ros_param.femur_length);
-    readRosParam("TIBIA_LENGTH", ros_param.tibia_length);
-    readRosParam("TARSUS_LENGTH", ros_param.tarsus_length);
-    readRosParam("COXA_TO_CENTER_X", ros_param.coxa_to_center_x);
-    readRosParam("COXA_TO_CENTER_Y", ros_param.coxa_to_center_y);
-    readRosParam("INIT_COXA_ANGLE", ros_param.init_coxa_angle);
+    readRosParam("NUMBER_OF_LEGS", ik_param.number_of_legs);
+    readRosParam("COXA_LENGTH", ik_param.coxa_length);
+    readRosParam("FEMUR_LENGTH", ik_param.femur_length);
+    readRosParam("TIBIA_LENGTH", ik_param.tibia_length);
+    readRosParam("TARSUS_LENGTH", ik_param.tarsus_length);
+    readRosParam("COXA_TO_CENTER_X", ik_param.coxa_to_center_x);
+    readRosParam("COXA_TO_CENTER_Y", ik_param.coxa_to_center_y);
+    readRosParam("INIT_COXA_ANGLE", ik_param.init_coxa_angle);
 
   } catch (const std::exception& e) {
     RCLCPP_ERROR(this->get_logger(), "Get param failed");
