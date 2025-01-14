@@ -28,11 +28,18 @@ class SpiderGaitGenerator {
  public:
   SpiderGaitGenerator(GaitParametrs parametrs);
 
+  std::vector<TransformStamped> getGaitPoints(
+      std::vector<TransformStamped> current_coordinates);
+
  private:
-  Coefficients calculationOfCoefficients(int point, Position coordinate_foot);
+  int current_point = 1;
+  Coefficients calculationOfCoefficients(Position coordinate_foot);
 
   std::vector<Position> calculationCoordinatesTrajectoryPoint(
       Coefficients coefficients);
   GaitParametrs gait_parametrs;
+  Position checkoordinatesTrajectoryPoint(
+      std::vector<Position> check_coordinates, Position coordinate_foot);
+  void pointIncrement();
 };
 }  // namespace spider_client_library

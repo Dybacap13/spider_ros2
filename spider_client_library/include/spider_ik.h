@@ -29,10 +29,10 @@ class SpiderIk {
 
   SpiderData IK(const std::vector<TransformStamped> feet,
                 const TransformStamped body, bool state);
+  std::vector<TransformStamped> coordFeetFromCoxa(std::vector<JointLeg> joints);
+  SpiderData ikCalculeterOwn(const std::vector<TransformStamped> feet);
 
  private:
-  SpiderData ikCalculeterOwn(const std::vector<TransformStamped> feet);
-  std::vector<TransformStamped> coordFeetFromCoxa(std::vector<JointLeg> joints);
   std::vector<TransformStamped> foot_current;
   std::vector<JointLeg> angle_joint_leg_current;
 

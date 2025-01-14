@@ -3,6 +3,7 @@
 #include <realtime_tools/realtime_publisher.h>
 #include <realtime_tools/realtime_server_goal_handle.h>
 #include <spider_convent_trajectory.h>
+#include <spider_gait_generator.h>
 #include <spider_ik.h>
 
 #include <control_msgs/action/follow_joint_trajectory.hpp>
@@ -51,6 +52,7 @@ class IkServers : public rclcpp::Node {
   // std::shared_ptr<rclcpp::Node> spider_control_node;
   std::shared_ptr<spider_client_library::SpiderIk> ik_solver;
   std::shared_ptr<spider_client_library::SpiderConventTrajectory> conventer;
+  std::shared_ptr<spider_client_library::SpiderGaitGenerator> gait_solver;
 
   // parametrs
   std::vector<double> COXA_TO_CENTER_X, COXA_TO_CENTER_Y;
@@ -82,6 +84,12 @@ class IkServers : public rclcpp::Node {
       joint_state_sub_;
   void jointStatesCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
   sensor_msgs::msg::JointState::SharedPtr joint_current;
+
+  // servers
+  rclcpp::Service<spider_msgs::srv::IK>::SharedPtr service_gait;
+  void getCalculateGait(
+      const std::shared_ptr<spider_msgs::srv::IK::Request> request,
+      std::shared_ptr<spider_msgs::srv::IK::Response> response);
 };
 
 }  // namespace spider_ik
