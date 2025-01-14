@@ -25,3 +25,4 @@ spider_client_library:
 
             STEP_LENGTH: 0.1
             STEP_HEIGHT: 0.05
+            NUMBER_POINTS: 10

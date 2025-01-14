@@ -39,6 +39,7 @@ initial_positions:
   joint_tibia_rm: -2.09439510239
   joint_tibia_rr: -2.09439510239
 
+
   # joint_coxa_lf: 0
   # joint_coxa_lm: 0
   # joint_coxa_lr: 0

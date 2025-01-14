@@ -15,6 +15,9 @@ IkServers::IkServers(rclcpp::NodeOptions options)
   ik_solver = std::make_shared<spider_client_library::SpiderIk>(ik_param);
   conventer =
       std::make_shared<spider_client_library::SpiderConventTrajectory>();
+
+  gait_solver =
+      std::make_shared<spider_client_library::SpiderGaitGenerator>(gait_param);
 }
 
 void IkServers::createActionClient() {
@@ -39,6 +42,9 @@ void IkServers::getRosParam() {
     readRosParam("COXA_TO_CENTER_X", ik_param.coxa_to_center_x);
     readRosParam("COXA_TO_CENTER_Y", ik_param.coxa_to_center_y);
     readRosParam("INIT_COXA_ANGLE", ik_param.init_coxa_angle);
+    readRosParam("STEP_LENGTH", gait_param.step_lenght);
+    readRosParam("STEP_HEIGHT", gait_param.step_height);
+    readRosParam("NUMBER_POINTS", gait_param.number_points);
 
   } catch (const std::exception& e) {
     RCLCPP_ERROR(this->get_logger(), "Get param failed");
@@ -136,7 +142,7 @@ void IkServers::getCalculateGait(
   auto joint_leg = conventer->conventFromMapJontsToLegJoints(joint_with_names);
   auto joint_position = ik_solver->coordFeetFromCoxa(joint_leg);
   std::vector<spider_client_library::SpiderData> spider_data_vector;
-  for (size_t point = 0; point < 10; point++) {
+  for (size_t point = 0; point < 1; point++) {
     auto joint_position_point_gait = gait_solver->getGaitPoints(joint_position);
     auto spider_data = ik_solver->ikCalculeterOwn(joint_position_point_gait);
     spider_data_vector.emplace_back(spider_data);

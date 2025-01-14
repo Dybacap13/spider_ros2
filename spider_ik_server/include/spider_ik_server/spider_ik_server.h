@@ -55,14 +55,11 @@ class IkServers : public rclcpp::Node {
   std::shared_ptr<spider_client_library::SpiderGaitGenerator> gait_solver;
 
   // parametrs
-  std::vector<double> COXA_TO_CENTER_X, COXA_TO_CENTER_Y;
-  std::vector<double> INIT_COXA_ANGLE;
-  // std::vector<double> INIT_FOOT_POS_X, INIT_FOOT_POS_Y, INIT_FOOT_POS_Z;
-  double COXA_LENGTH, FEMUR_LENGTH, TIBIA_LENGTH, TARSUS_LENGTH;
-  int NUMBER_OF_LEGS;
+
   template <typename T>
   void readRosParam(const std::string param_name, T& param_value);
   spider_client_library::IkParametrs ik_param;
+  spider_client_library::GaitParametrs gait_param;
 
   // servers
   rclcpp::Service<spider_msgs::srv::IK>::SharedPtr service_ik;
