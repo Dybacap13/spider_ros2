@@ -33,6 +33,7 @@ class SpiderGaitGenerator {
 
  private:
   int current_point = 1;
+  double step_x = 0.04;
   Coefficients calculationOfCoefficients(Position coordinate_foot);
 
   std::vector<Position> calculationCoordinatesTrajectoryPoint(
@@ -41,5 +42,8 @@ class SpiderGaitGenerator {
   Position checkoordinatesTrajectoryPoint(
       std::vector<Position> check_coordinates, Position coordinate_foot);
   void pointIncrement();
+  std::vector<int> cycle_gait = {1, 0, 1, 0, 1, 0};
+
+  // std::vector<int> sing_gait = {0, 0, 0, 1, 1, 1};
 };
 }  // namespace spider_client_library

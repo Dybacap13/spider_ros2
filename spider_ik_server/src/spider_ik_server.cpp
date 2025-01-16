@@ -142,9 +142,15 @@ void IkServers::getCalculateGait(
   auto joint_leg = conventer->conventFromMapJontsToLegJoints(joint_with_names);
   auto joint_position = ik_solver->coordFeetFromCoxa(joint_leg);
   std::vector<spider_client_library::SpiderData> spider_data_vector;
-  for (size_t point = 0; point < 1; point++) {
+  for (size_t point = 0; point < gait_param.number_points - 1; point++) {
+    std::cout << "POINT -----" << std::endl;
     auto joint_position_point_gait = gait_solver->getGaitPoints(joint_position);
     auto spider_data = ik_solver->ikCalculeterOwn(joint_position_point_gait);
+    for (int i = 0; i < 1; i++) {
+      std::cout << "coxa = " << spider_data.legs[i].coxa << std::endl;
+      std::cout << "femur = " << spider_data.legs[i].femur << std::endl;
+      std::cout << "tibia = " << spider_data.legs[i].tibia << std::endl;
+    }
     spider_data_vector.emplace_back(spider_data);
   }
 
