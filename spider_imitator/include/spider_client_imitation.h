@@ -60,7 +60,7 @@ class SpiderClientImitation : public SpiderClientInterface {
   std::atomic<bool> terminated;
   uint32_t ctime;
   double rate = 5.0;
-  double profile_velocity = 0.1;
+  double profile_velocity = 0.75;
 };
 
 }  // namespace spider_client_library
