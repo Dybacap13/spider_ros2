@@ -23,5 +23,6 @@ spider_client_library:
             TARSUS_LENGTH: 0.00
 
 
-            STEP_LENGTH: 0.01
-            STEP_HEIGHT: 0.03
+            STEP_LENGTH: 0.1
+            STEP_HEIGHT: 0.05
+            NUMBER_POINTS: 10

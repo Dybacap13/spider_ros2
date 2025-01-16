@@ -10,8 +10,29 @@
 #include <rclcpp_action/rclcpp_action.hpp>
 #include <spider_msgs/msg/joints.hpp>
 #include <spider_msgs/srv/ik.hpp>
+
 using namespace spider_client_library;
 namespace spider_driver {
+
+std::vector<std::string> joint_names_joint_state = {
+    "joint_coxa_rr"
+    "joint_femur_rr",
+    "joint_tibia_rr",
+    "joint_coxa_rm",
+    "joint_femur_rm",
+    "joint_tibia_lf",
+    "joint_coxa_lf",
+    "joint_tibia_lm",
+    "joint_tibia_rm",
+    "joint_femur_lm",
+    "joint_femur_lf",
+    "joint_coxa_lr",
+    "joint_tibia_lr",
+    "joint_femur_lr",
+    "joint_coxa_rf",
+    "joint_tibia_rf",
+    "joint_coxa_lm",
+    "joint_femur_rf"};
 
 class SpiderControl {
  public:
