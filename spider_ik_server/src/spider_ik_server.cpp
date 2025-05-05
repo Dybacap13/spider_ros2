@@ -194,20 +194,21 @@ void IkServers::getScaledCalculateIk(
   offset.position.x = 0;
   offset.position.y = 0.08;
 
-  auto joint_scale = ik_solver->scalingLegs(joint_position, body, 50);
+  auto joint_scale = ik_solver->scalingLegs(joint_position, body, 50, 0.05);
   gait_solver->getTrajectory(joint_position, joint_scale, 10, traj);
   auto joint_offset = ik_solver->offsetLegs(joint_scale, offset);
 
   gait_solver->getTrajectory(joint_scale, joint_offset, 10, traj);
 
   offset.position.x = 0;
-  offset.position.y = -0.03;
+  offset.position.y = -0.08;
 
-  auto joint_scale_2 = ik_solver->scalingLegs(joint_offset, body, 1 / 50);
+  auto joint_scale_2 =
+      ik_solver->scalingLegs(joint_offset, body, 1 / 50, -0.05);
 
-  // auto joint_offset_2 = ik_solver->offsetLegs(joint_scale_2, offset);
+  auto joint_offset_2 = ik_solver->offsetLegs(joint_scale_2, offset);
 
-  gait_solver->getTrajectory(joint_offset, joint_position, 10, traj);
+  gait_solver->getTrajectory(joint_offset, joint_offset_2, 10, traj);
 
   std::vector<spider_client_library::SpiderData> spider_data_vector;
 

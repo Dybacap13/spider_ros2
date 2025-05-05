@@ -36,7 +36,7 @@ class SpiderIk {
   // моя новая стратегия
   std::vector<TransformStamped> scalingLegs(
       std::vector<TransformStamped> current_joint, TransformStamped body_center,
-      double scale_tcp);
+      double scale_tcp, double z);
   std::vector<TransformStamped> offsetLegs(std::vector<TransformStamped>,
                                            TransformStamped body_center);
 

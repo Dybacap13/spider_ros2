@@ -353,7 +353,7 @@ TransformStamped SpiderIk::getTargetBodyFromOffset(TransformStamped body,
 
 std::vector<TransformStamped> SpiderIk::scalingLegs(
     std::vector<TransformStamped> current_joint, TransformStamped body_center,
-    double scale_tcp) {
+    double scale_tcp, double z) {
   double START_KOEFFICIENT = 33.88;
 
   double sim_coeff = scale_tcp / START_KOEFFICIENT;
@@ -368,7 +368,7 @@ std::vector<TransformStamped> SpiderIk::scalingLegs(
         sim_coeff *
             (current_joint[index_leg].position.y - body_center.position.y) +
         body_center.position.y;
-    result[index_leg].position.z = result[index_leg].position.z + 0.05;
+    result[index_leg].position.z = current_joint[index_leg].position.z + z;
   }
   return result;
 }
