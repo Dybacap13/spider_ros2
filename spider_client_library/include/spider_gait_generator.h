@@ -31,6 +31,11 @@ class SpiderGaitGenerator {
   std::vector<TransformStamped> getGaitPoints(
       std::vector<TransformStamped> current_coordinates);
 
+  void getTrajectory(std::vector<TransformStamped> current_coordinates,
+                     std::vector<TransformStamped> target_coordinates,
+                     int point,
+                     std::vector<std::vector<TransformStamped>>& trajectory);
+
  private:
   int current_point = 1;
   double step_x = 0.04;

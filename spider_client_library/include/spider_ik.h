@@ -14,6 +14,7 @@
 namespace spider_client_library {
 std::vector<std::string> names_leg_ik = {"rr", "rm", "rf", "lr", "lm", "lf"};
 static const double PI = atan(1.0) * 4.0;
+
 class SpiderIk {
  public:
   SpiderIk(IkParametrs ros_parametrs_);
@@ -31,6 +32,13 @@ class SpiderIk {
                 const TransformStamped body, bool state);
   std::vector<TransformStamped> coordFeetFromCoxa(std::vector<JointLeg> joints);
   SpiderData ikCalculeterOwn(const std::vector<TransformStamped> feet);
+
+  // моя новая стратегия
+  std::vector<TransformStamped> scalingLegs(
+      std::vector<TransformStamped> current_joint, TransformStamped body_center,
+      double scale_tcp);
+  std::vector<TransformStamped> offsetLegs(std::vector<TransformStamped>,
+                                           TransformStamped body_center);
 
  private:
   std::vector<TransformStamped> foot_current;

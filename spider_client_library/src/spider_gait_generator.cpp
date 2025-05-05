@@ -151,4 +151,38 @@ std::vector<TransformStamped> SpiderGaitGenerator::getGaitPoints(
   return result;
 }
 
+void SpiderGaitGenerator::getTrajectory(
+    std::vector<TransformStamped> current_coordinates,
+    std::vector<TransformStamped> target_coordinates, int points_number,
+    std::vector<std::vector<TransformStamped>>& trajectory) {
+  for (size_t point = 1; point < points_number + 1; point++) {
+    float alpha = static_cast<float>(point) / points_number;
+    std::vector<TransformStamped> point_i;
+    for (size_t index_leg = 0; index_leg < current_coordinates.size();
+         index_leg++) {
+      TransformStamped intermediate;
+      // интерполяционный коэффициент [0, 1]
+
+      // Интерполяция позиции
+      intermediate.position.x =
+          current_coordinates[index_leg].position.x +
+          alpha * (target_coordinates[index_leg].position.x -
+                   current_coordinates[index_leg].position.x);
+
+      intermediate.position.y =
+          current_coordinates[index_leg].position.y +
+          alpha * (target_coordinates[index_leg].position.y -
+                   current_coordinates[index_leg].position.y);
+
+      intermediate.position.z =
+          current_coordinates[index_leg].position.z +
+          alpha * (target_coordinates[index_leg].position.z -
+                   current_coordinates[index_leg].position.z);
+
+      point_i.emplace_back(intermediate);
+    }
+    trajectory.emplace_back(point_i);
+  }
+}
+
 }  // namespace spider_client_library

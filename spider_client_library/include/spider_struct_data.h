@@ -5,6 +5,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <stdint.h>
+#include <cstdint>
 
 namespace spider_client_library {
 
@@ -54,8 +56,8 @@ struct IkParametrs {
 };
 
 struct TimeJointTrajectory {
-  std::int32_t sec;
-  std::uint32_t nanosec;
+  int32_t sec;
+  uint32_t nanosec;
 };
 struct HeaderJointTrajectory {
   TimeJointTrajectory stamp;
@@ -63,8 +65,8 @@ struct HeaderJointTrajectory {
 };
 
 struct DurationJoint {
-  std::int32_t sec;
-  std::uint32_t nanosec;
+  int32_t sec;
+  uint32_t nanosec;
 };
 
 struct JointTrajectoryPoint {

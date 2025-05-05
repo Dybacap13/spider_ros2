@@ -351,4 +351,40 @@ TransformStamped SpiderIk::getTargetBodyFromOffset(TransformStamped body,
   return body_target;
 }
 
+std::vector<TransformStamped> SpiderIk::scalingLegs(
+    std::vector<TransformStamped> current_joint, TransformStamped body_center,
+    double scale_tcp) {
+  double START_KOEFFICIENT = 33.88;
+
+  double sim_coeff = scale_tcp / START_KOEFFICIENT;
+  std::vector<TransformStamped> result = current_joint;
+
+  for (size_t index_leg = 0; index_leg < current_joint.size(); index_leg++) {
+    result[index_leg].position.x =
+        sim_coeff *
+            (current_joint[index_leg].position.x - body_center.position.x) +
+        body_center.position.x;
+    result[index_leg].position.y =
+        sim_coeff *
+            (current_joint[index_leg].position.y - body_center.position.y) +
+        body_center.position.y;
+    result[index_leg].position.z = result[index_leg].position.z + 0.05;
+  }
+  return result;
+}
+
+std::vector<TransformStamped> SpiderIk::offsetLegs(
+    std::vector<TransformStamped> current_joint, TransformStamped offset) {
+  std::vector<TransformStamped> result = current_joint;
+
+  for (size_t index_leg = 0; index_leg < current_joint.size(); index_leg++) {
+    result[index_leg].position.x =
+        current_joint[index_leg].position.x + offset.position.x;
+    result[index_leg].position.y =
+        current_joint[index_leg].position.y + offset.position.y;
+    result[index_leg].position.z = current_joint[index_leg].position.z;
+  }
+  return result;
+}
+
 }  // namespace spider_client_library

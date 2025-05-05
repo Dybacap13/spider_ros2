@@ -87,6 +87,12 @@ class IkServers : public rclcpp::Node {
   void getCalculateGait(
       const std::shared_ptr<spider_msgs::srv::IK::Request> request,
       std::shared_ptr<spider_msgs::srv::IK::Response> response);
+
+
+  void getScaledCalculateIk(
+        const std::shared_ptr<spider_msgs::srv::IK::Request> request,
+        std::shared_ptr<spider_msgs::srv::IK::Response> response);
+      
 };
 
 }  // namespace spider_ik

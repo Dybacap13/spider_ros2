@@ -69,7 +69,7 @@ void IkServers::createService() {
 
   service_gait = create_service<spider_msgs::srv::IK>(
       "spider/gait_generator",
-      std::bind(&IkServers::getCalculateGait, this, std::placeholders::_1,
+      std::bind(&IkServers::getScaledCalculateIk, this, std::placeholders::_1,
                 std::placeholders::_2));
 }
 void IkServers::getCalculateIk(
@@ -174,6 +174,76 @@ void IkServers::getCalculateGait(
 
   RCLCPP_INFO(this->get_logger(), "Accepted new action goal");
 }
+
+void IkServers::getScaledCalculateIk(
+    const std::shared_ptr<spider_msgs::srv::IK::Request> request,
+    std::shared_ptr<spider_msgs::srv::IK::Response> response) {
+  std::map<std::string, double> joint_with_names;
+  for (size_t index = 0; index < joint_current->name.size(); index++) {
+    joint_with_names.insert(
+        {joint_current->name[index], joint_current->position[index]});
+  }
+  auto joint_leg = conventer->conventFromMapJontsToLegJoints(joint_with_names);
+  auto joint_position = ik_solver->coordFeetFromCoxa(joint_leg);
+  std::vector<std::vector<spider_client_library::TransformStamped>> traj;
+  spider_client_library::TransformStamped body;
+  body.position.x = 0;
+  body.position.y = 0;
+
+  spider_client_library::TransformStamped offset;
+  offset.position.x = 0;
+  offset.position.y = 0.08;
+
+  auto joint_scale = ik_solver->scalingLegs(joint_position, body, 50);
+  gait_solver->getTrajectory(joint_position, joint_scale, 10, traj);
+  auto joint_offset = ik_solver->offsetLegs(joint_scale, offset);
+
+  gait_solver->getTrajectory(joint_scale, joint_offset, 10, traj);
+
+  offset.position.x = 0;
+  offset.position.y = -0.03;
+
+  auto joint_scale_2 = ik_solver->scalingLegs(joint_offset, body, 1 / 50);
+
+  // auto joint_offset_2 = ik_solver->offsetLegs(joint_scale_2, offset);
+
+  gait_solver->getTrajectory(joint_offset, joint_position, 10, traj);
+
+  std::vector<spider_client_library::SpiderData> spider_data_vector;
+
+  for (size_t point = 0; point < traj.size(); point++) {
+    std::cout << "POINT -----" << point << std::endl;
+
+    auto spider_data = ik_solver->ikCalculeterOwn(traj[point]);
+    for (int i = 0; i < 1; i++) {
+      std::cout << "coxa = " << spider_data.legs[i].coxa << std::endl;
+      std::cout << "femur = " << spider_data.legs[i].femur << std::endl;
+      std::cout << "tibia = " << spider_data.legs[i].tibia << std::endl;
+    }
+    spider_data_vector.emplace_back(spider_data);
+  }
+
+  auto points = conventer->conventFromJointsLegsToTragectoryMsg(
+      spider_data_vector, joint_with_names, joint_current->name);
+
+  auto goal_msg = control_msgs::action::JointTrajectory::Goal();
+  for (size_t index = 0; index < points.points.size(); index++) {
+    trajectory_msgs::msg::JointTrajectoryPoint point_tj;
+    point_tj.positions = points.points[index].positions;
+    goal_msg.trajectory.points.emplace_back(point_tj);
+  }
+  // MUTEX
+
+  auto send_goal_options = rclcpp_action::Client<
+      control_msgs::action::JointTrajectory>::SendGoalOptions();
+  send_goal_options.result_callback =
+      std::bind(&IkServers::resultActionClient, this, std::placeholders::_1);
+  auto goal_handle_future = spider_control_action_client_->async_send_goal(
+      goal_msg, send_goal_options);
+
+  RCLCPP_INFO(this->get_logger(), "Accepted new action goal");
+}
+
 }  // namespace spider_ik
 #include "rclcpp_components/register_node_macro.hpp"
 RCLCPP_COMPONENTS_REGISTER_NODE(spider_ik::IkServers)
