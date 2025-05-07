@@ -10,9 +10,9 @@ Eigen::Matrix<double, 4, 4> SpiderIk::transformationDenaviteHartenberg(
       a * cos(tetta), sin(tetta), cos(tetta) * cos(alpha),
       -cos(tetta) * sin(alpha), a * sin(tetta), 0, sin(alpha), cos(alpha), d, 0,
       0, 0, 1;
-  std::cout << " " << std::endl;
-  std::cout << result;
-  std::cout << " " << std::endl;
+  // std::cout << " " << std::endl;
+  // std::cout << result;
+  // std::cout << " " << std::endl;
   return result;
 }
 
@@ -360,14 +360,14 @@ std::vector<TransformStamped> SpiderIk::scalingLegs(
   std::vector<TransformStamped> result = current_joint;
 
   for (size_t index_leg = 0; index_leg < current_joint.size(); index_leg++) {
-    result[index_leg].position.x =
-        sim_coeff *
-            (current_joint[index_leg].position.x - body_center.position.x) +
-        body_center.position.x;
-    result[index_leg].position.y =
-        sim_coeff *
-            (current_joint[index_leg].position.y - body_center.position.y) +
-        body_center.position.y;
+    // result[index_leg].position.x =
+    //     sim_coeff *
+    //         (current_joint[index_leg].position.x - body_center.position.x) +
+    //     body_center.position.x;
+    // result[index_leg].position.y =
+    //     sim_coeff *
+    //         (current_joint[index_leg].position.y - body_center.position.y) +
+    //     body_center.position.y;
     result[index_leg].position.z = current_joint[index_leg].position.z + z;
   }
   return result;
@@ -382,9 +382,100 @@ std::vector<TransformStamped> SpiderIk::offsetLegs(
         current_joint[index_leg].position.x + offset.position.x;
     result[index_leg].position.y =
         current_joint[index_leg].position.y + offset.position.y;
+    result[index_leg].position.z =
+        current_joint[index_leg].position.z + offset.position.z;
+  }
+  return result;
+}
+
+std::vector<TransformStamped> SpiderIk::aaa(
+    std::vector<TransformStamped> current_joint, TransformStamped offset) {
+  std::vector<TransformStamped> result = current_joint;
+
+  for (size_t index_leg = 0; index_leg < current_joint.size(); index_leg++) {
+    double angle = atan(ik_parametrs.coxa_to_center_x[index_leg] /
+                        ik_parametrs.coxa_to_center_y[index_leg]);
+
+    result[index_leg].position.x = current_joint[index_leg].position.x +
+                                   offset.position.x * getSinCos(angle).cosine;
+    result[index_leg].position.y = current_joint[index_leg].position.y +
+                                   offset.position.x * getSinCos(angle).sine;
     result[index_leg].position.z = current_joint[index_leg].position.z;
   }
   return result;
 }
 
+std::vector<TransformStamped> SpiderIk::coordBodyToCoxa(
+    std::vector<TransformStamped> from_body) {
+  std::vector<TransformStamped> from_coxa;
+  from_coxa.resize(from_body.size());
+
+  for (size_t index_leg = 0; index_leg < from_body.size(); index_leg++) {
+    auto coxa_z = sqrt(pow(ik_parametrs.coxa_to_center_x[index_leg], 2) +
+                       pow(ik_parametrs.coxa_to_center_y[index_leg], 2));
+    auto tetta_one = atan2(ik_parametrs.coxa_to_center_x[index_leg],
+                           ik_parametrs.coxa_to_center_y[index_leg]);
+    auto body_coxa = transformationDenaviteHartenberg(coxa_z, 0, 0, tetta_one);
+
+    auto aaa = body_coxa.inverse();
+
+    auto ddd = transformStampedToRotationMatrix(from_body[index_leg]);
+
+    from_coxa[index_leg].position = getCoordinateFromTDH(aaa * ddd);
+  }
+  return from_coxa;
+}
+
+Eigen::Matrix<double, 3, 3> SpiderIk::rotationMatrixZ(double angle) {
+  Eigen::Matrix<double, 3, 3> matrix_rotary;
+
+  matrix_rotary << cos(angle), -sin(angle), 0, sin(angle), cos(angle), 0, 0, 0,
+      1;
+  return matrix_rotary;
+}
+
+Eigen::Matrix<double, 4, 4> SpiderIk::transformStampedToRotationMatrix(
+    TransformStamped transform_stamped) {
+  double r_11 = cos(transform_stamped.orientation.yaw) *
+                cos(transform_stamped.orientation.pitch);
+  double r_12 = cos(transform_stamped.orientation.yaw) *
+                    sin(transform_stamped.orientation.pitch) *
+                    sin(transform_stamped.orientation.roll) -
+                sin(transform_stamped.orientation.yaw) *
+                    cos(transform_stamped.orientation.roll);
+  double r_13 = cos(transform_stamped.orientation.yaw) *
+                    sin(transform_stamped.orientation.pitch) *
+                    cos(transform_stamped.orientation.roll) +
+                sin(transform_stamped.orientation.yaw) *
+                    sin(transform_stamped.orientation.roll);
+
+  double r_21 = sin(transform_stamped.orientation.yaw) *
+                cos(transform_stamped.orientation.pitch);
+
+  double r_22 = sin(transform_stamped.orientation.yaw) *
+                    sin(transform_stamped.orientation.pitch) *
+                    sin(transform_stamped.orientation.roll) +
+                cos(transform_stamped.orientation.yaw) *
+                    cos(transform_stamped.orientation.roll);
+  double r_23 = sin(transform_stamped.orientation.yaw) *
+                    sin(transform_stamped.orientation.pitch) *
+                    cos(transform_stamped.orientation.roll) -
+                cos(transform_stamped.orientation.yaw) *
+                    sin(transform_stamped.orientation.roll);
+
+  double r_31 = -sin(transform_stamped.orientation.pitch);
+
+  double r_32 = cos(transform_stamped.orientation.pitch) *
+                sin(transform_stamped.orientation.roll);
+
+  double r_33 = cos(transform_stamped.orientation.pitch) *
+                cos(transform_stamped.orientation.roll);
+
+  Eigen::Matrix<double, 4, 4> result;
+
+  result << r_11, r_12, r_13, transform_stamped.position.x, r_21, r_22, r_23,
+      transform_stamped.position.y, r_31, r_32, r_33,
+      transform_stamped.position.z, 0, 0, 0, 1;
+  return result;
+}
 }  // namespace spider_client_library

@@ -32,13 +32,22 @@ class SpiderIk {
                 const TransformStamped body, bool state);
   std::vector<TransformStamped> coordFeetFromCoxa(std::vector<JointLeg> joints);
   SpiderData ikCalculeterOwn(const std::vector<TransformStamped> feet);
-
+  std::vector<TransformStamped> ikCalculeterJointFromBody(
+      std::vector<JointLeg> joints);
   // моя новая стратегия
   std::vector<TransformStamped> scalingLegs(
       std::vector<TransformStamped> current_joint, TransformStamped body_center,
       double scale_tcp, double z);
   std::vector<TransformStamped> offsetLegs(std::vector<TransformStamped>,
                                            TransformStamped body_center);
+  std::vector<TransformStamped> aaa(std::vector<TransformStamped>,
+                                    TransformStamped body_center);
+
+  std::vector<TransformStamped> coordFeetFromBody(TransformStamped body,
+                                                  std::vector<JointLeg> joints);
+
+  std::vector<TransformStamped> coordBodyToCoxa(
+      std::vector<TransformStamped> from_body);
 
  private:
   std::vector<TransformStamped> foot_current;
@@ -55,9 +64,12 @@ class SpiderIk {
   std::vector<TransformStamped> coordFeetFromBody(TransformStamped body);
   TransformStamped calculateRotaryBodyZ(TransformStamped body_target,
                                         TransformStamped body_current);
+
+  Eigen::Matrix<double, 3, 3> rotationMatrixZ(double angle);
+
+  Eigen::Matrix<double, 4, 4> transformStampedToRotationMatrix(
+      TransformStamped transform_stamped);
   IkParametrs ik_parametrs;
-  std::vector<TransformStamped> coordFeetFromBody(TransformStamped body,
-                                                  std::vector<JointLeg> joints);
 
   TransformStamped body_current;
 };

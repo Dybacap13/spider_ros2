@@ -184,31 +184,66 @@ void IkServers::getScaledCalculateIk(
         {joint_current->name[index], joint_current->position[index]});
   }
   auto joint_leg = conventer->conventFromMapJontsToLegJoints(joint_with_names);
-  auto joint_position = ik_solver->coordFeetFromCoxa(joint_leg);
-  std::vector<std::vector<spider_client_library::TransformStamped>> traj;
+
   spider_client_library::TransformStamped body;
   body.position.x = 0;
   body.position.y = 0;
+  body.position.z = 0;
+
+  auto joint_position = ik_solver->coordFeetFromBody(body, joint_leg);
+  std::cout << " coordFeetFromBody = " << std::endl;
+  for (int i = 0; i < joint_position.size(); i++) {
+    std::cout << joint_position[i].position.x << std::endl;
+    std::cout << joint_position[i].position.y << std::endl;
+    std::cout << joint_position[i].position.z << std::endl;
+    std::cout << "---" << std::endl;
+  }
+  auto joint_position_coxa = ik_solver->coordFeetFromCoxa(joint_leg);
+  std::cout << " coordFeetFromCoxa = " << std::endl;
+  for (int i = 0; i < joint_position.size(); i++) {
+    std::cout << joint_position_coxa[i].position.x << std::endl;
+    std::cout << joint_position_coxa[i].position.y << std::endl;
+    std::cout << joint_position_coxa[i].position.z << std::endl;
+    std::cout << "---" << std::endl;
+  }
+  std::vector<std::vector<spider_client_library::TransformStamped>> traj;
 
   spider_client_library::TransformStamped offset;
-  offset.position.x = 0;
+  offset.position.x = 0.0;
   offset.position.y = 0.08;
 
-  auto joint_scale = ik_solver->scalingLegs(joint_position, body, 50, 0.05);
-  gait_solver->getTrajectory(joint_position, joint_scale, 10, traj);
-  auto joint_offset = ik_solver->offsetLegs(joint_scale, offset);
+  // auto joint_scale = ik_solver->scalingLegs(joint_position, body, 50, 0);
+  // gait_solver->getTrajectory(joint_position, joint_scale, 10, traj);
+  auto joint_offset = ik_solver->offsetLegs(joint_position, offset);
 
-  gait_solver->getTrajectory(joint_scale, joint_offset, 10, traj);
+  std::cout << " offsetLegs = " << offset.position.x << " " << offset.position.y
+            << std::endl;
+  for (int i = 0; i < joint_position.size(); i++) {
+    std::cout << joint_offset[i].position.x << std::endl;
+    std::cout << joint_offset[i].position.y << std::endl;
+    std::cout << joint_offset[i].position.z << std::endl;
+    std::cout << "---" << std::endl;
+  }
 
-  offset.position.x = 0;
-  offset.position.y = -0.08;
+  auto joint_offset_coxa = ik_solver->coordBodyToCoxa(joint_offset);
+  std::cout << " coordBodyToCoxa = " << std::endl;
+  for (int i = 0; i < joint_offset_coxa.size(); i++) {
+    std::cout << joint_offset_coxa[i].position.x << std::endl;
+    std::cout << joint_offset_coxa[i].position.y << std::endl;
+    std::cout << joint_offset_coxa[i].position.z << std::endl;
+    std::cout << "---" << std::endl;
+  }
 
-  auto joint_scale_2 =
-      ik_solver->scalingLegs(joint_offset, body, 1 / 50, -0.05);
+  gait_solver->getTrajectory(joint_position_coxa, joint_offset_coxa, 10, traj);
 
-  auto joint_offset_2 = ik_solver->offsetLegs(joint_scale_2, offset);
+  // offset.position.x = -0.08;
+  // offset.position.y = 0;
 
-  gait_solver->getTrajectory(joint_offset, joint_offset_2, 10, traj);
+  // auto joint_scale_2 = ik_solver->scalingLegs(joint_offset, body, 1 / 50, 0);
+
+  // auto joint_offset_2 = ik_solver->offsetLegs(joint_scale_2, offset);
+
+  // gait_solver->getTrajectory(joint_offset, joint_offset_2, 10, traj);
 
   std::vector<spider_client_library::SpiderData> spider_data_vector;
 
