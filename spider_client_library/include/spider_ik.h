@@ -49,6 +49,9 @@ class SpiderIk {
   std::vector<TransformStamped> coordBodyToCoxa(
       std::vector<TransformStamped> from_body);
 
+  SpiderData ikCalculeterFromBody(
+      const std::vector<TransformStamped> feet_relatively_body);
+
  private:
   std::vector<TransformStamped> foot_current;
   std::vector<JointLeg> angle_joint_leg_current;

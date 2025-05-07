@@ -71,8 +71,8 @@ std::vector<TransformStamped> SpiderIk::coordFeetFromBody(
     TransformStamped foot;
     auto coxa_z = sqrt(pow(ik_parametrs.coxa_to_center_x[index_leg], 2) +
                        pow(ik_parametrs.coxa_to_center_y[index_leg], 2));
-    auto tetta_one = atan2(ik_parametrs.coxa_to_center_x[index_leg],
-                           ik_parametrs.coxa_to_center_y[index_leg]);
+    auto tetta_one = atan2(ik_parametrs.coxa_to_center_y[index_leg],
+                           ik_parametrs.coxa_to_center_x[index_leg]);
     auto body_coxa = transformationDenaviteHartenberg(coxa_z, 0, 0, tetta_one);
 
     auto coxa_femur = transformationDenaviteHartenberg(
@@ -477,5 +477,81 @@ Eigen::Matrix<double, 4, 4> SpiderIk::transformStampedToRotationMatrix(
       transform_stamped.position.y, r_31, r_32, r_33,
       transform_stamped.position.z, 0, 0, 0, 1;
   return result;
+}
+
+SpiderData SpiderIk::ikCalculeterFromBody(
+    const std::vector<TransformStamped> feet_relatively_body) {
+  SpiderData spider_result;
+  std::vector<TransformStamped> feet_relatively_coxa;
+  feet_relatively_coxa.resize(feet_relatively_body.size());
+
+  for (size_t index = 0; index < feet_relatively_body.size(); index++) {
+    auto matrix_rotary =
+        rotationMatrixZ(atan2(ik_parametrs.coxa_to_center_y[index],
+                              ik_parametrs.coxa_to_center_x[index]));
+    Eigen::Matrix<double, 3, 1> new_vector;
+    Eigen::Matrix<double, 3, 1> old_vector;
+
+    old_vector << feet_relatively_body[index].position.x,
+        feet_relatively_body[index].position.y,
+        feet_relatively_body[index].position.z;
+
+    new_vector = matrix_rotary * old_vector;
+    std::cout << " Rotary " << std::endl;
+    std::cout << " " << std::endl;
+    std::cout << new_vector;
+    std::cout << " " << std::endl;
+
+    feet_relatively_coxa[index].position.x =
+        new_vector[0] + ik_parametrs.coxa_to_center_x[index];
+    feet_relatively_coxa[index].position.y =
+        new_vector[1] + ik_parametrs.coxa_to_center_y[index];
+    feet_relatively_coxa[index].position.z = new_vector[2];
+    std::cout << " Offset " << std::endl;
+    std::cout << " " << std::endl;
+    std::cout << " x = " << feet_relatively_coxa[index].position.x << std::endl;
+    std::cout << " y = " << feet_relatively_coxa[index].position.y << std::endl;
+    std::cout << " z = " << feet_relatively_coxa[index].position.z << std::endl;
+    std::cout << " " << std::endl;
+  }
+
+  // int index = 0;
+  // for (auto leg : feet_relatively_coxa) {
+  //   JointLeg joint_leg;
+  //   auto femur_to_tarsus =
+  //       sqrt(pow(leg.position.x, 2) + pow(leg.position.y, 2)) -
+  //       ik_parametrs.coxa_length;
+
+  //   if (std::abs(femur_to_tarsus) >
+  //       (ik_parametrs.femur_length + ik_parametrs.tibia_length)) {
+  //     std::cout << "IK Solver cannot solve a foot position that is not within
+  //     "
+  //                  "leg reach!!!"
+  //               << std::endl;
+
+  //     break;
+  //   }
+  //   auto eee = sqrt(pow(femur_to_tarsus, 2) + pow(leg.position.z, 2));
+
+  //   auto q0 = atan2(leg.position.y, leg.position.x);
+
+  //   auto q1 = acos((pow(ik_parametrs.femur_length, 2) + pow(eee, 2) -
+  //                   pow(ik_parametrs.tibia_length, 2)) /
+  //                  (2 * ik_parametrs.femur_length * eee)) +
+  //             atan2(leg.position.z, femur_to_tarsus);
+
+  //   auto q2 = -M_PI +
+  //             acos((pow(ik_parametrs.femur_length, 2) +
+  //                   pow(ik_parametrs.tibia_length, 2) - pow(eee, 2)) /
+  //                  (2 * ik_parametrs.femur_length *
+  //                  ik_parametrs.tibia_length));
+  //   joint_leg.coxa = q0;
+  //   joint_leg.femur = q1;
+  //   joint_leg.tibia = q2;
+  //   joint_leg.name = names_leg_ik[index];
+  //   index++;
+  //   spider_result.legs.emplace_back(joint_leg);
+  // }
+  return spider_result;
 }
 }  // namespace spider_client_library
