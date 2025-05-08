@@ -485,34 +485,54 @@ SpiderData SpiderIk::ikCalculeterFromBody(
   std::vector<TransformStamped> feet_relatively_coxa;
   feet_relatively_coxa.resize(feet_relatively_body.size());
 
-  for (size_t index = 0; index < feet_relatively_body.size(); index++) {
-    auto matrix_rotary =
-        rotationMatrixZ(atan2(ik_parametrs.coxa_to_center_y[index],
-                              ik_parametrs.coxa_to_center_x[index]));
-    Eigen::Matrix<double, 3, 1> new_vector;
-    Eigen::Matrix<double, 3, 1> old_vector;
+  for (size_t index_leg = 0; index_leg < feet_relatively_body.size();
+       index_leg++) {
+    auto coxa_z = sqrt(pow(ik_parametrs.coxa_to_center_x[index_leg], 2) +
+                       pow(ik_parametrs.coxa_to_center_y[index_leg], 2));
+    auto tetta_one = atan2(ik_parametrs.coxa_to_center_y[index_leg],
+                           ik_parametrs.coxa_to_center_x[index_leg]);
+    auto body_coxa = transformationDenaviteHartenberg(coxa_z, 0, 0, tetta_one);
+    auto leg_matrix =
+        transformStampedToRotationMatrix(feet_relatively_body[index_leg]);
+    auto result = body_coxa.inverse() * leg_matrix;
+    feet_relatively_coxa[index_leg].position = getCoordinateFromTDH(result);
 
-    old_vector << feet_relatively_body[index].position.x,
-        feet_relatively_body[index].position.y,
-        feet_relatively_body[index].position.z;
+    std::cout << " x = " << feet_relatively_coxa[index_leg].position.x
+              << std::endl;
+    std::cout << " y = " << feet_relatively_coxa[index_leg].position.y
+              << std::endl;
+    std::cout << " z = " << feet_relatively_coxa[index_leg].position.z
+              << std::endl;
+    std::cout << " ---" << std::endl;
 
-    new_vector = matrix_rotary * old_vector;
-    std::cout << " Rotary " << std::endl;
-    std::cout << " " << std::endl;
-    std::cout << new_vector;
-    std::cout << " " << std::endl;
+    // auto matrix_rotary =
+    //     rotationMatrixZ(atan2(ik_parametrs.coxa_to_center_y[index],
+    //                           ik_parametrs.coxa_to_center_x[index]));
+    // Eigen::Matrix<double, 3, 1> new_vector;
+    // Eigen::Matrix<double, 3, 1> old_vector;
 
-    feet_relatively_coxa[index].position.x =
-        new_vector[0] + ik_parametrs.coxa_to_center_x[index];
-    feet_relatively_coxa[index].position.y =
-        new_vector[1] + ik_parametrs.coxa_to_center_y[index];
-    feet_relatively_coxa[index].position.z = new_vector[2];
-    std::cout << " Offset " << std::endl;
-    std::cout << " " << std::endl;
-    std::cout << " x = " << feet_relatively_coxa[index].position.x << std::endl;
-    std::cout << " y = " << feet_relatively_coxa[index].position.y << std::endl;
-    std::cout << " z = " << feet_relatively_coxa[index].position.z << std::endl;
-    std::cout << " " << std::endl;
+    // old_vector << feet_relatively_body[index].position.x,
+    //     feet_relatively_body[index].position.y,
+    //     feet_relatively_body[index].position.z;
+
+    // new_vector = matrix_rotary * old_vector;
+    // std::cout << " Rotary " << std::endl;
+    // std::cout << " " << std::endl;
+    // std::cout << new_vector;
+    // std::cout << " " << std::endl;
+
+    // feet_relatively_coxa[index].position.x =
+    //     new_vector[0] + ik_parametrs.coxa_to_center_x[index];
+    // feet_relatively_coxa[index].position.y =
+    //     new_vector[1] + ik_parametrs.coxa_to_center_y[index];
+    // feet_relatively_coxa[index].position.z = new_vector[2];
+    // std::cout << " Offset " << std::endl;
+    // std::cout << " " << std::endl;
+    // std::cout << " x = " << feet_relatively_coxa[index].position.x <<
+    // std::endl; std::cout << " y = " << feet_relatively_coxa[index].position.y
+    // << std::endl; std::cout << " z = " <<
+    // feet_relatively_coxa[index].position.z << std::endl; std::cout << " " <<
+    // std::endl;
   }
 
   // int index = 0;
@@ -552,6 +572,6 @@ SpiderData SpiderIk::ikCalculeterFromBody(
   //   index++;
   //   spider_result.legs.emplace_back(joint_leg);
   // }
-  return spider_result;
+  return ikCalculeterOwn(feet_relatively_coxa);
 }
 }  // namespace spider_client_library

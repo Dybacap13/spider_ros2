@@ -72,6 +72,9 @@ class SpiderIk {
 
   Eigen::Matrix<double, 4, 4> transformStampedToRotationMatrix(
       TransformStamped transform_stamped);
+
+  Eigen::Matrix<double, 4, 4> transformStampedToDH(
+      TransformStamped transform_stamped);
   IkParametrs ik_parametrs;
 
   TransformStamped body_current;
