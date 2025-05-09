@@ -39,6 +39,7 @@ class SpiderClientImitation : public SpiderClientInterface {
   void getJointData(std::vector<double>& data) override;
   void stop() override;
   void writeJointCommandPosition(std::vector<double> target_position) override;
+  void moveByTrajectory(std::vector<double> target_position) override;
 
  private:
   bool checkNan(std::vector<double> check_vector);
@@ -47,6 +48,9 @@ class SpiderClientImitation : public SpiderClientInterface {
   void movePositionMode(size_t index_actuator);
   double getIntermediatePointsTrajectory(double first_pos, double next_point,
                                          double diff);
+
+  bool comparetePosition(std::vector<double> current_position,
+                         std::vector<double> target_position);
 
   std::mutex mu;
   std::vector<std::string> joint_names;

@@ -114,4 +114,27 @@ void SpiderClientImitation::stop() {
   std::cout << "STOP";
 }
 
+void SpiderClientImitation::moveByTrajectory(
+    std::vector<double> target_position) {
+  writeJointCommandPosition(target_position);
+  std::vector<double> current_position;
+  current_position.resize(target_position.size());
+  getJointData(current_position);
+  int a = 0;
+  while (!comparetePosition(target_position, current_position)) {
+    std::cout << a << std::endl;
+    getJointData(current_position);
+    a++;
+  }
+}
+
+bool SpiderClientImitation::comparetePosition(
+    std::vector<double> current_position, std::vector<double> target_position) {
+  for (size_t index = 0; index < current_position.size(); index++) {
+    if (current_position[index] != target_position[index]) {
+      return false;
+    }
+  }
+  return true;
+}
 }  // namespace spider_client_library

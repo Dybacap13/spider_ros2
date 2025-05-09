@@ -88,11 +88,11 @@ class IkServers : public rclcpp::Node {
       const std::shared_ptr<spider_msgs::srv::IK::Request> request,
       std::shared_ptr<spider_msgs::srv::IK::Response> response);
 
-
   void getScaledCalculateIk(
-        const std::shared_ptr<spider_msgs::srv::IK::Request> request,
-        std::shared_ptr<spider_msgs::srv::IK::Response> response);
-      
+      const std::shared_ptr<spider_msgs::srv::IK::Request> request,
+      std::shared_ptr<spider_msgs::srv::IK::Response> response);
+
+  void getIterationStep(double lenght_step, double lifting_step);
 };
 
 }  // namespace spider_ik

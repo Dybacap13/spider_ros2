@@ -192,19 +192,21 @@ void IkServers::getScaledCalculateIk(
 
   auto joint_position_body = ik_solver->coordFeetFromBody(body, joint_leg);
 
-  // for (int index = 0; index < joint_position_body.size(); index++) {
-  //   std::cout << " x = " << joint_position_body[index].position.x <<
-  //   std::endl; std::cout << " y = " << joint_position_body[index].position.y
-  //   << std::endl; std::cout << " z = " <<
-  //   joint_position_body[index].position.z << std::endl; std::cout << " --- "
-  //   << std::endl;
-  // }
-  spider_client_library::TransformStamped offset;
-  offset.position.x = 0;
-  offset.position.y = 0;
-  offset.position.z = 0.03;  // yes
-  auto joint_position_offset_body =
-      ik_solver->offsetLegs(joint_position_body, offset);
+  // // for (int index = 0; index < joint_position_body.size(); index++) {
+  // //   std::cout << " x = " << joint_position_body[index].position.x <<
+  // //   std::endl; std::cout << " y = " <<
+  // joint_position_body[index].position.y
+  // //   << std::endl; std::cout << " z = " <<
+  // //   joint_position_body[index].position.z << std::endl; std::cout << " ---
+  // "
+  // //   << std::endl;
+  // // }
+  // spider_client_library::TransformStamped offset;
+  // offset.position.x = 0;
+  // offset.position.y = 0;
+  // offset.position.z = 0.03;  // yes
+  // auto joint_position_offset_body =
+  //     ik_solver->offsetLegs(joint_position_body, offset);
 
   // for (int index = 0; index < joint_position_offset_body.size(); index++) {
   //   std::cout << " x = " << joint_position_offset_body[index].position.x
@@ -217,32 +219,35 @@ void IkServers::getScaledCalculateIk(
   // }
 
   std::vector<std::vector<spider_client_library::TransformStamped>> traj;
-  gait_solver->getTrajectory(joint_position_body, joint_position_offset_body,
-                             20, traj);
+  for (int i = 0; i < 10; i++) {
+    gait_solver->generationOneIterationStepTrajectory(
+        joint_position_body, request->offset.linear.x, request->offset.linear.z,
+        traj);
+  }
 
-  offset.position.x = 0.07;
-  offset.position.y = 0;
-  offset.position.z = 0.00;  // yes
-  auto joint_position_offset_body_2 =
-      ik_solver->offsetLegs(joint_position_offset_body, offset);
-  gait_solver->getTrajectory(joint_position_offset_body,
-                             joint_position_offset_body_2, 20, traj);
+  // offset.position.x = 0.07;
+  // offset.position.y = 0;
+  // offset.position.z = 0.00;  // yes
+  // auto joint_position_offset_body_2 =
+  //     ik_solver->offsetLegs(joint_position_offset_body, offset);
+  // gait_solver->getTrajectory(joint_position_offset_body,
+  //                            joint_position_offset_body_2, 20, traj);
 
-  offset.position.x = 0.0;
-  offset.position.y = 0;
-  offset.position.z = -0.03;  // yes
-  auto joint_position_offset_body_3 =
-      ik_solver->offsetLegs(joint_position_offset_body_2, offset);
-  gait_solver->getTrajectory(joint_position_offset_body_2,
-                             joint_position_offset_body_3, 20, traj);
+  // offset.position.x = 0.0;
+  // offset.position.y = 0;
+  // offset.position.z = -0.03;  // yes
+  // auto joint_position_offset_body_3 =
+  //     ik_solver->offsetLegs(joint_position_offset_body_2, offset);
+  // gait_solver->getTrajectory(joint_position_offset_body_2,
+  //                            joint_position_offset_body_3, 20, traj);
 
-  offset.position.x = -0.07;
-  offset.position.y = 0;
-  offset.position.z = 0.0;  // yes
-  auto joint_position_offset_body_4 =
-      ik_solver->offsetLegs(joint_position_offset_body_3, offset);
-  gait_solver->getTrajectory(joint_position_offset_body_3,
-                             joint_position_offset_body_4, 20, traj);
+  // offset.position.x = -0.07;
+  // offset.position.y = 0;
+  // offset.position.z = 0.0;  // yes
+  // auto joint_position_offset_body_4 =
+  //     ik_solver->offsetLegs(joint_position_offset_body_3, offset);
+  // gait_solver->getTrajectory(joint_position_offset_body_3,
+  //                            joint_position_offset_body_4, 20, traj);
 
   std::vector<spider_client_library::SpiderData> spider_data_vector;
 

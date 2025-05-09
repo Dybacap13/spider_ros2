@@ -119,8 +119,8 @@ Position SpiderGaitGenerator::checkoordinatesTrajectoryPoint(
 void SpiderGaitGenerator::pointIncrement() {
   if (current_point == gait_parametrs.number_points) {
     current_point = 1;
-    for (size_t index = 0; index < cycle_gait.size(); index++) {
-      cycle_gait[index] = !cycle_gait[index];
+    for (size_t index = 0; index < cycle_gait_.size(); index++) {
+      cycle_gait_[index] = !cycle_gait_[index];
     }
   } else {
     current_point++;
@@ -134,7 +134,7 @@ std::vector<TransformStamped> SpiderGaitGenerator::getGaitPoints(
   for (size_t leg = 0; leg < current_coordinates.size(); leg++) {
     TransformStamped led_position;
 
-    if (!cycle_gait[leg]) {
+    if (!cycle_gait_[leg]) {
       led_position = current_coordinates[leg];
     } else {
       auto coeff = calculationOfCoefficients(current_coordinates[leg].position);
@@ -185,4 +185,102 @@ void SpiderGaitGenerator::getTrajectory(
   }
 }
 
+void SpiderGaitGenerator::generationOneIterationStepTrajectory(
+    std::vector<TransformStamped> start_joint, double lenght_step,
+    double lifting_step, std::vector<std::vector<TransformStamped>>& traj) {
+  std::vector<int> cycle_gait = {1, 0, 1, 0, 1, 0};
+  auto vector_offset = generatorVectorOffsetLegs(lenght_step, lifting_step);
+  // std::vector<std::vector<spider_client_library::TransformStamped>> traj;
+  std::vector<TransformStamped> last_joint = start_joint;
+  for (size_t offset_step = 0; offset_step < vector_offset.size();
+       offset_step++) {
+    std::cout << "offset.x = " << vector_offset[offset_step].position.x
+              << std::endl;
+    std::cout << "offset.y = " << vector_offset[offset_step].position.y
+              << std::endl;
+    std::cout << "offset.z = " << vector_offset[offset_step].position.z
+              << std::endl;
+    auto step = offsetLegs(start_joint, cycle_gait, vector_offset[offset_step]);
+    getTrajectory(last_joint, step, 20, traj);
+    last_joint = step;
+  }
+
+  inverseGaitCycle(cycle_gait);
+
+  for (size_t offset_step = 0; offset_step < vector_offset.size();
+       offset_step++) {
+    auto step = offsetLegs(start_joint, cycle_gait, vector_offset[offset_step]);
+    getTrajectory(last_joint, step, 20, traj);
+    last_joint = step;
+  }
+}
+
+std::vector<TransformStamped> SpiderGaitGenerator::offsetLegs(
+    std::vector<TransformStamped> current_joint, std::vector<int> cycle_gait,
+    TransformStamped offset) {
+  std::vector<TransformStamped> result = current_joint;
+  for (size_t index_leg = 0; index_leg < current_joint.size(); index_leg++) {
+    if (cycle_gait[index_leg]) {
+      result[index_leg].position.x =
+          current_joint[index_leg].position.x + offset.position.x;
+      result[index_leg].position.y =
+          current_joint[index_leg].position.y + offset.position.y;
+      result[index_leg].position.z =
+          current_joint[index_leg].position.z + offset.position.z;
+    }
+  }
+
+  return result;
+}
+
+// void SpiderGaitGenerator::offsetParametrsLegs(double& leg,
+//   double offset) {
+// leg =  leg +offset.position.x;
+// leg.position.y = offset.position.y;
+// leg.position.z = offset.position.z;
+
+// leg.orientation.pitch = offset.orientation.pitch;
+// leg.orientation.roll = offset.orientation.roll;
+// leg.orientation.yaw = offset.orientation.yaw;
+// }
+
+std::vector<TransformStamped> SpiderGaitGenerator::generatorVectorOffsetLegs(
+    double step_length, double step_higth) {
+  std::vector<TransformStamped> result;
+  TransformStamped step_1;
+  step_1.position.x = 0.0;
+  step_1.position.y = 0.0;
+  step_1.position.z = step_higth;
+  result.emplace_back(step_1);
+
+  TransformStamped step_2;
+  step_2.position.x = step_length;
+  step_2.position.y = 0.0;
+  step_2.position.z = 0.0;
+  result.emplace_back(step_2);
+
+  TransformStamped step_3;
+  step_3.position.x = 0.0;
+  step_3.position.y = 0.0;
+  step_3.position.z = 0.0;
+  result.emplace_back(step_3);
+
+  TransformStamped step_4;
+  step_4.position.x = 0.0;
+  step_4.position.y = 0.0;
+  step_4.position.z = 0.0;
+  result.emplace_back(step_4);
+
+  return result;
+}
+
+void SpiderGaitGenerator::inverseGaitCycle(std::vector<int>& vector) {
+  for (size_t index = 0; index < vector.size(); index++) {
+    if (vector[index] == 1) {
+      vector[index] = 0;
+    } else {
+      vector[index] = 1;
+    }
+  }
+}
 }  // namespace spider_client_library

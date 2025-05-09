@@ -36,6 +36,10 @@ class SpiderGaitGenerator {
                      int point,
                      std::vector<std::vector<TransformStamped>>& trajectory);
 
+  void generationOneIterationStepTrajectory(
+      std::vector<TransformStamped> start_joint, double lenght_step,
+      double lifting_step, std::vector<std::vector<TransformStamped>>& traj);
+
  private:
   int current_point = 1;
   double step_x = 0.04;
@@ -47,8 +51,16 @@ class SpiderGaitGenerator {
   Position checkoordinatesTrajectoryPoint(
       std::vector<Position> check_coordinates, Position coordinate_foot);
   void pointIncrement();
-  std::vector<int> cycle_gait = {1, 0, 1, 0, 1, 0};
 
+  std::vector<TransformStamped> offsetLegs(
+      std::vector<TransformStamped> current_joint, std::vector<int> cycle_gait,
+      TransformStamped offset);
+
+  std::vector<TransformStamped> generatorVectorOffsetLegs(double step_length,
+                                                          double step_higth);
+
+  void inverseGaitCycle(std::vector<int>& vector);
+  std::vector<int> cycle_gait_ = {1, 0, 1, 0, 1, 0};
   // std::vector<int> sing_gait = {0, 0, 0, 1, 1, 1};
 };
 }  // namespace spider_client_library

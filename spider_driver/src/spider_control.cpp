@@ -110,7 +110,7 @@ void SpiderControl::executeTrajectory(
       std::cout << "index = " << index << std::endl;
       spider_interface->writeJointCommandPosition(
           goal->trajectory.points[index].positions);
-      std::this_thread::sleep_for(100ms);
+      std::this_thread::sleep_for(50ms);
     }
 
     goal_handle->succeed(result);
