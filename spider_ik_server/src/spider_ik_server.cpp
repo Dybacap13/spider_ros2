@@ -221,8 +221,9 @@ void IkServers::getScaledCalculateIk(
   std::vector<std::vector<spider_client_library::TransformStamped>> traj;
   for (int i = 0; i < 10; i++) {
     gait_solver->generationOneIterationStepTrajectory(
-        joint_position_body, request->offset.linear.x, request->offset.linear.z,
-        traj);
+        joint_position_body, request->gait_parametrs.step_length,
+        request->gait_parametrs.step_height,
+        request->gait_parametrs.inverce_step_length, traj);
   }
 
   // offset.position.x = 0.07;

@@ -3,16 +3,16 @@
 #include <spider_client_interface.h>
 
 #include <atomic>
+#include <deque>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
-
 namespace spider_client_library {
 
-enum class ControlMode { DISABLE, EFFORT, POSITION, VELOCITY };
+enum class ControlMode { DISABLE, EFFORT, POSITION, VELOCITY, TRAJECTORY };
 
 class ActuatorState {
  public:
@@ -39,7 +39,8 @@ class SpiderClientImitation : public SpiderClientInterface {
   void getJointData(std::vector<double>& data) override;
   void stop() override;
   void writeJointCommandPosition(std::vector<double> target_position) override;
-  void moveByTrajectory(std::vector<double> target_position) override;
+
+  void writeTrajectory(std::vector<double> target_position) override;
 
  private:
   bool checkNan(std::vector<double> check_vector);
@@ -52,6 +53,8 @@ class SpiderClientImitation : public SpiderClientInterface {
   bool comparetePosition(std::vector<double> current_position,
                          std::vector<double> target_position);
 
+  void moveByTrajectory(size_t index_actuator);
+
   std::mutex mu;
   std::vector<std::string> joint_names;
   std::vector<double> joint_state_imit;
@@ -60,6 +63,10 @@ class SpiderClientImitation : public SpiderClientInterface {
   std::vector<double> joint_effort_target;
   std::vector<std::shared_ptr<Actuator>> actuators;
   std::thread cycle_thread;
+  std::vector<std::deque<double>> position_command;
+  std::vector<double> last_position_traj;
+
+  std::deque<int> index_trajectory;
 
   std::atomic<bool> terminated;
   uint32_t ctime;

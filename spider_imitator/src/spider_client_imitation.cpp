@@ -5,6 +5,7 @@ namespace spider_client_library {
 SpiderClientImitation::SpiderClientImitation(std::vector<double> initial_pose)
     : terminated(false) {
   actuators.resize(initial_pose.size());
+  position_command.resize(initial_pose.size());
 
   for (auto& actuator : actuators) {
     actuator = std::make_shared<Actuator>();
@@ -16,6 +17,8 @@ SpiderClientImitation::SpiderClientImitation(std::vector<double> initial_pose)
   joint_position_target.resize(initial_pose.size(), 0.0);
   joint_velocity_target.resize(initial_pose.size(), 0.0);
   joint_effort_target.resize(initial_pose.size(), 0.0);
+
+  last_position_traj.resize(initial_pose.size());
 
   ctime = 1.0 / rate * 1000 * 1000;  // microseconds
   cycle_thread = std::thread(&SpiderClientImitation::cycle, this);
@@ -51,6 +54,10 @@ void SpiderClientImitation::update() {
       movePositionMode(index_actuator);
       continue;
     }
+    if (actuators[index_actuator]->mode == ControlMode::TRAJECTORY) {
+      moveByTrajectory(index_actuator);
+      continue;
+    }
     if (actuators[index_actuator]->mode == ControlMode::DISABLE) {
       continue;
     }
@@ -61,6 +68,7 @@ void SpiderClientImitation::update() {
 
 void SpiderClientImitation::movePositionMode(size_t index_actuator) {
   const std::lock_guard<std::mutex> lock(mu);
+
   if (actuators[index_actuator]->state.position ==
       joint_position_target[index_actuator]) {
     actuators[index_actuator]->state.velocity = 0.0;
@@ -95,7 +103,19 @@ void SpiderClientImitation::writeJointCommandPosition(
   }
   for (std::size_t current = 0; current < target_position.size(); current++) {
     actuators[current]->mode = ControlMode::POSITION;
-    joint_position_target[current] = target_position[current];
+    joint_position_target[current] = (target_position[current]);
+  }
+}
+
+void SpiderClientImitation::writeTrajectory(
+    std::vector<double> target_position) {
+  const std::lock_guard<std::mutex> lock(mu);
+  if (!checkNan(target_position)) {
+    return;
+  }
+  for (std::size_t current = 0; current < target_position.size(); current++) {
+    actuators[current]->mode = ControlMode::TRAJECTORY;
+    position_command[current].push_back(target_position[current]);
   }
 }
 
@@ -114,18 +134,24 @@ void SpiderClientImitation::stop() {
   std::cout << "STOP";
 }
 
-void SpiderClientImitation::moveByTrajectory(
-    std::vector<double> target_position) {
-  writeJointCommandPosition(target_position);
-  std::vector<double> current_position;
-  current_position.resize(target_position.size());
-  getJointData(current_position);
-  int a = 0;
-  while (!comparetePosition(target_position, current_position)) {
-    std::cout << a << std::endl;
-    getJointData(current_position);
-    a++;
+void SpiderClientImitation::moveByTrajectory(size_t index_actuator) {
+  // std::cout << "moveByTrajectory" << std::endl;
+  if (position_command[index_actuator].empty()) {
+    return;
   }
+  if (last_position_traj[index_actuator] !=
+      actuators[index_actuator]->state.position) {
+    actuators[index_actuator]->state.position =
+        last_position_traj[index_actuator];
+    return;
+  }
+
+  last_position_traj[index_actuator] = position_command[index_actuator].front();
+  actuators[index_actuator]->state.position =
+      last_position_traj[index_actuator];
+
+  position_command[index_actuator].pop_front();
+  actuators[index_actuator]->state.velocity = 0.5;
 }
 
 bool SpiderClientImitation::comparetePosition(

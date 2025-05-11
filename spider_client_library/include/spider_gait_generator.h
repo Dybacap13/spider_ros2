@@ -38,7 +38,8 @@ class SpiderGaitGenerator {
 
   void generationOneIterationStepTrajectory(
       std::vector<TransformStamped> start_joint, double lenght_step,
-      double lifting_step, std::vector<std::vector<TransformStamped>>& traj);
+      double lifting_step, bool inverce,
+      std::vector<std::vector<TransformStamped>>& traj);
 
  private:
   int current_point = 1;
@@ -57,7 +58,8 @@ class SpiderGaitGenerator {
       TransformStamped offset);
 
   std::vector<TransformStamped> generatorVectorOffsetLegs(double step_length,
-                                                          double step_higth);
+                                                          double step_higth,
+                                                          bool inverce);
 
   void inverseGaitCycle(std::vector<int>& vector);
   std::vector<int> cycle_gait_ = {1, 0, 1, 0, 1, 0};

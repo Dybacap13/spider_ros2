@@ -187,9 +187,11 @@ void SpiderGaitGenerator::getTrajectory(
 
 void SpiderGaitGenerator::generationOneIterationStepTrajectory(
     std::vector<TransformStamped> start_joint, double lenght_step,
-    double lifting_step, std::vector<std::vector<TransformStamped>>& traj) {
+    double lifting_step, bool inverce,
+    std::vector<std::vector<TransformStamped>>& traj) {
   std::vector<int> cycle_gait = {1, 0, 1, 0, 1, 0};
-  auto vector_offset = generatorVectorOffsetLegs(lenght_step, lifting_step);
+  auto vector_offset =
+      generatorVectorOffsetLegs(lenght_step, lifting_step, inverce);
   // std::vector<std::vector<spider_client_library::TransformStamped>> traj;
   std::vector<TransformStamped> last_joint = start_joint;
   for (size_t offset_step = 0; offset_step < vector_offset.size();
@@ -245,7 +247,7 @@ std::vector<TransformStamped> SpiderGaitGenerator::offsetLegs(
 // }
 
 std::vector<TransformStamped> SpiderGaitGenerator::generatorVectorOffsetLegs(
-    double step_length, double step_higth) {
+    double step_length, double step_higth, bool inverce) {
   std::vector<TransformStamped> result;
   TransformStamped step_1;
   step_1.position.x = 0.0;
@@ -260,7 +262,12 @@ std::vector<TransformStamped> SpiderGaitGenerator::generatorVectorOffsetLegs(
   result.emplace_back(step_2);
 
   TransformStamped step_3;
-  step_3.position.x = 0.0;
+  if (inverce) {
+    step_3.position.x = -step_length;
+  } else {
+    step_3.position.x = 0.0;
+  }
+
   step_3.position.y = 0.0;
   step_3.position.z = 0.0;
   result.emplace_back(step_3);

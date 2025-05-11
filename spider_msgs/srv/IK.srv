@@ -1,3 +1,4 @@
+spider_msgs/GaitParametrs gait_parametrs
 geometry_msgs/Twist offset
 ---
 bool success
