@@ -21,6 +21,17 @@ from launch_ros.descriptions import ComposableNode
 from ament_index_python import get_package_share_directory
 import os
 
+from launch import LaunchDescription
+from launch.event_handlers import OnProcessExit
+from launch.actions import RegisterEventHandler
+from launch_ros.actions import Node
+from ament_index_python.packages import get_package_share_directory
+from launch.actions import IncludeLaunchDescription, ExecuteProcess
+from launch.substitutions import Command
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+import os
+
+
 def get_package_file(package, file_path):
     """Get the location of a file installed in an ament package"""
     package_path = get_package_share_directory(package)
@@ -87,10 +98,16 @@ def generate_launch_description():
     )
 
 
+
 # rviz
 
   declared_arguments.append(
-        DeclareLaunchArgument("launch_rviz", default_value="true", description="Launch RViz?")
+        DeclareLaunchArgument("launch_rviz", default_value="false", description="Launch RViz?")
+    )
+
+  
+  declared_arguments.append(
+        DeclareLaunchArgument("launch_gazebo", default_value="false", description="Launch Gazebo?")
     )
   
 
@@ -121,6 +138,7 @@ def generate_launch_description():
   controllers_package = LaunchConfiguration("controllers_package")
   controllers_file = LaunchConfiguration("controllers_file")
   launch_rviz = LaunchConfiguration("launch_rviz")
+  launch_gazebo = LaunchConfiguration("launch_gazebo")
 
   parametrs_package = LaunchConfiguration("parametrs_package")
   parametrs_file = LaunchConfiguration("parametrs_file")
@@ -179,6 +197,29 @@ def generate_launch_description():
         ],
         output = 'screen'
     )
+  
+  container_gazebo = ComposableNodeContainer(
+        name = 'spider_gazebo',
+        namespace = '',
+        package = 'rclcpp_components',
+        executable = 'component_container_mt',
+        emulate_tty = True,
+       
+        composable_node_descriptions = [
+            ComposableNode(
+                package = 'spider_controllers',
+                plugin = 'spider_gazebo::GazeboControllers',
+                name = 'spider_gazebo', 
+                namespace = '',
+                extra_arguments = [{"use_intra_process_comms": True}],
+
+            )
+        ],
+        output = 'screen'
+    )
+
+
+
 
 # ****************************
 #       Nodes control        *
@@ -197,6 +238,35 @@ def generate_launch_description():
   rviz_node = Node(
         package="rviz2",
         condition=IfCondition(launch_rviz),
+        executable="rviz2",
+        name="rviz2_moveit",
+        output="log",
+        arguments=[
+            '-d' + os.path.join(get_package_share_directory('spider_common'), 'cfg', 'rviz2.rviz')],
+
+        parameters=[
+            robot_description   
+        ],
+    )
+  
+      # Запуск мира Gazebo
+
+  default_world = os.path.join(
+        get_package_share_directory('spider_controllers'),
+        'worlds',
+        'empty.world'
+    )
+
+#   gazebo = IncludeLaunchDescription(
+#         PythonLaunchDescriptionSource(
+#             os.path.join(get_package_share_directory('ros_gz_sim'), 'launch', 'gz_sim.launch.py')
+#         ),
+#         launch_arguments={'gz_args': ['-r ', default_world], 'on_exit_shutdown': 'true'}.items()
+#     )
+
+  gazebo_node = Node(
+        package="gazebo",
+        condition=IfCondition(launch_gazebo),
         executable="rviz2",
         name="rviz2_moveit",
         output="log",
@@ -287,6 +357,8 @@ def generate_launch_description():
   control_node_start.append(rviz_node)
   control_node_start.append(delay_joint_state_broadcaster_spawner_after_ros2_control_node)
   control_node_start.append(container_parametrs)
+  control_node_start.append(container_gazebo)
+  control_node_start.append(default_world)
   
 
 
