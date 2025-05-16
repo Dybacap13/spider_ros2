@@ -251,33 +251,31 @@ def generate_launch_description():
   
       # Запуск мира Gazebo
 
-  default_world = os.path.join(
-        get_package_share_directory('spider_controllers'),
-        'worlds',
-        'empty.world'
-    )
-
-#   gazebo = IncludeLaunchDescription(
-#         PythonLaunchDescriptionSource(
-#             os.path.join(get_package_share_directory('ros_gz_sim'), 'launch', 'gz_sim.launch.py')
-#         ),
-#         launch_arguments={'gz_args': ['-r ', default_world], 'on_exit_shutdown': 'true'}.items()
-#     )
-
-  gazebo_node = Node(
-        package="gazebo",
-        condition=IfCondition(launch_gazebo),
-        executable="rviz2",
-        name="rviz2_moveit",
-        output="log",
-        arguments=[
-            '-d' + os.path.join(get_package_share_directory('spider_common'), 'cfg', 'rviz2.rviz')],
-
-        parameters=[
-            robot_description   
-        ],
+    # Путь к пакету gazebo_ros
+  gazebo_ros_pkg = get_package_share_directory('gazebo_ros')
+    
+    # Запуск Gazebo с пустым миром
+  gazebo = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(gazebo_ros_pkg, 'launch', 'gazebo.launch.py')
+        ),
+        launch_arguments={'world': 'empty.world'}.items()
     )
   
+  
+        # Загрузка модели робота (например, TurtleBot3)
+  spawn_robot = Node(
+        package='gazebo_ros',
+        executable='spawn_entity.py',
+        arguments=[
+            '-entity', 'my_robot',  # Имя робота в Gazebo
+            '-topic', 'robot_description',  # Топик, откуда брать URDF/SDF
+            '-x', '0.0',  # Позиция X
+            '-y', '0.0',  # Позиция Y
+            '-z', '0.1'   # Позиция Z (чтобы не упал)
+        ],
+        output='screen'
+    )
   robot_state_pub_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
@@ -358,11 +356,14 @@ def generate_launch_description():
   control_node_start.append(delay_joint_state_broadcaster_spawner_after_ros2_control_node)
   control_node_start.append(container_parametrs)
   control_node_start.append(container_gazebo)
-  control_node_start.append(default_world)
+  control_node_start.append(spawn_robot)
+  control_node_start.append(gazebo)
   
 
 
   return LaunchDescription(declared_arguments +
                             control_node_start +
                             delay_robot_controller_spawners_after_joint_state_broadcaster_spawner 
+                           #  
+                            
                             )      
