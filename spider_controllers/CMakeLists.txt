@@ -48,6 +48,7 @@ install(
 
 install(EXPORT export_${PROJECT_NAME} DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY worlds DESTINATION share/${PROJECT_NAME})
 
 # export
 ament_export_include_directories(include)
