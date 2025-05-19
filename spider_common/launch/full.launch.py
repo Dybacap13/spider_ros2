@@ -27,7 +27,7 @@ from launch.actions import RegisterEventHandler
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 from launch.actions import IncludeLaunchDescription, ExecuteProcess
-from launch.substitutions import Command
+from launch.substitutions import Command, PythonExpression
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 import os
 
@@ -96,18 +96,30 @@ def generate_launch_description():
             description="spider_parametrs.yaml",
         )
     )
+  
+  declared_arguments.append(
+        DeclareLaunchArgument(
+            "gazebo_package",
+            default_value="spider_gazebo",
+            description="spider_gazebo",
+        )
+    )
+
 
 
 
 # rviz
 
   declared_arguments.append(
-        DeclareLaunchArgument("launch_rviz", default_value="true", description="Launch RViz?")
+        DeclareLaunchArgument("launch_rviz", default_value="false", description="Launch RViz?")
     )
-
   
+
+
+# gazebo
+
   declared_arguments.append(
-        DeclareLaunchArgument("launch_gazebo", default_value="false", description="Launch Gazebo?")
+        DeclareLaunchArgument("launch_gazebo", default_value="true", description="Launch Gazebo?")
     )
   
 
@@ -143,7 +155,21 @@ def generate_launch_description():
   parametrs_package = LaunchConfiguration("parametrs_package")
   parametrs_file = LaunchConfiguration("parametrs_file")
 
+  gazebo_package = LaunchConfiguration("gazebo_package")
 
+
+# *********************************
+#     Path and format models      *
+# *********************************
+
+ # Динамически определяем путь к моделям
+  models_path = PythonExpression([
+        "'package://spider_description/meshes' if '", 
+        LaunchConfiguration('launch_rviz'), 
+        "' == 'true' else ",
+        "'file://$(find spider_description)/meshes'"
+    ])
+  
 
 # ****************************
 #  Robot description URDF    *
@@ -155,7 +181,14 @@ def generate_launch_description():
             " ",
             PathJoinSubstitution(
                 [FindPackageShare(description_package), "urdf", description_file]
-            )
+            ),
+            # " ",
+            # "path_meshes:=",
+            # "file://$(find spider_description)/meshes"
+
+            # " ",
+            # "format_meshes_stl:=",
+            # launch_rviz
             ]
         )
   
@@ -235,6 +268,10 @@ def generate_launch_description():
             emulate_tty=True,
           )
 
+# *******************
+#       Rviz        *
+# *******************
+
   rviz_node = Node(
         package="rviz2",
         condition=IfCondition(launch_rviz),
@@ -249,34 +286,60 @@ def generate_launch_description():
         ],
     )
   
-#       # Запуск мира Gazebo
 
-#     # Путь к пакету gazebo_ros
-#   gazebo_ros_pkg = get_package_share_directory('gazebo_ros')
-    
-#     # Запуск Gazebo с пустым миром
-#   gazebo = IncludeLaunchDescription(
-#         PythonLaunchDescriptionSource(
-#             os.path.join(gazebo_ros_pkg, 'launch', 'gazebo.launch.py')
-#         ),
-#         launch_arguments={'world': 'empty.world'}.items()
-#     )
+# *******************
+#       Gazebo      *
+# *******************
+ 
+
+  default_world = os.path.join(
+        get_package_share_directory('spider_gazebo'),
+        'worlds',
+        'empty.world'
+    )
+
+  gazebo = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('ros_gz_sim'), 'launch', 'gz_sim.launch.py')
+        ),
+        launch_arguments={'gz_args': ['-r ', default_world], 'on_exit_shutdown': 'true'}.items()
+    )
   
+
+        # Загрузка модели робота (например, TurtleBot3)
+  spawn_entity = Node(
+        package='ros_gz_sim',
+       # condition=IfCondition(launch_gazebo),
+        executable='create',
+        arguments=[
+            '-topic', 'robot_description',
+            '-entity', 'spider',
+            '-x', '0.0',
+            '-y', '0.0', 
+            '-z', '1.0',
+            '-R', '0.0',
+            '-P', '0.0',
+            '-Y', '0.0'
+        ],
+        output='screen'
+    )
   
-#         # Загрузка модели робота (например, TurtleBot3)
-#   spawn_robot = Node(
-#         package='gazebo_ros',
-#         executable='spawn_entity.py',
-#         arguments=[
-#             '-entity', 'my_robot',  # Имя робота в Gazebo
-#             '-topic', 'robot_description',  # Топик, откуда брать URDF/SDF
-#             '-x', '0.0',  # Позиция X
-#             '-y', '0.0',  # Позиция Y
-#             '-z', '0.1'   # Позиция Z (чтобы не упал)
-#         ],
-#         output='screen'
-#     )
+
+  bridge_params = os.path.join(get_package_share_directory('spider_gazebo'),'config','gz_bridge.yaml')
+  ros_gz_bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        arguments=[
+            '--ros-args',
+            '-p',
+            f'config_file:={bridge_params}',
+        ]
+    )
+
   
+# *********************************
+#       robot_state_pub_node      *
+# *********************************
 
   robot_state_pub_node = Node(
         package="robot_state_publisher",
@@ -358,8 +421,9 @@ def generate_launch_description():
   control_node_start.append(delay_joint_state_broadcaster_spawner_after_ros2_control_node)
   control_node_start.append(container_parametrs)
   control_node_start.append(container_gazebo)
-#   control_node_start.append(spawn_robot)
-#   control_node_start.append(gazebo)
+  control_node_start.append(spawn_entity)
+  control_node_start.append(gazebo)
+  control_node_start.append(ros_gz_bridge)
   
 
 

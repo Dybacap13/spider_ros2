@@ -1,9 +1,3 @@
-from ament_index_python.packages import get_package_share_directory
-import os
-from launch.actions import IncludeLaunchDescription, ExecuteProcess
-from launch.substitutions import Command
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch_ros.actions import Node
 from launch import LaunchDescription
 from launch.event_handlers import OnProcessExit
 from launch.actions import RegisterEventHandler
@@ -14,19 +8,18 @@ from launch.substitutions import Command
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 import os
 
-
 def generate_launch_description():
-    pkg_spider_gazebo = get_package_share_directory('spider_gazebo')
+    # Путь к пакету inspector_gazebo
+    pkg_inspector_gazebo = get_package_share_directory('inspector_gazebo')
 
-    pkg_spider_description = get_package_share_directory('spider_description')
+    # Запуск мира Gazebo
 
-   # Запуск мира Gazebo
     default_world = os.path.join(
-        get_package_share_directory('spider_gazebo'),
+        get_package_share_directory('inspector_gazebo'),
         'worlds',
         'empty.world'
     )
-  
+
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('ros_gz_sim'), 'launch', 'gz_sim.launch.py')
@@ -34,25 +27,24 @@ def generate_launch_description():
         launch_arguments={'gz_args': ['-r ', default_world], 'on_exit_shutdown': 'true'}.items()
     )
 
-    #  # Загрузка модели робота
-    # robot_description = Command(['xacro ', str(os.path.join(pkg_spider_description, 'urdf', 'spider.urdf.xacro'))])
+    # Загрузка модели робота
+    robot_description = Command(['xacro ', str(os.path.join(pkg_inspector_gazebo, 'description', 'gazebo.urdf.xacro'))])
+    
+    robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{'robot_description': robot_description}]
+    )
 
-
-    # robot_state_publisher = Node(
-    #     package='robot_state_publisher',
-    #     executable='robot_state_publisher',
-    #     name='robot_state_publisher',
-    #     output='screen',
-    #     parameters=[{'robot_description': robot_description}]
-    # )
-
-        # Спавн робота в Gazebo
+    # Спавн робота в Gazebo
     spawn_entity = Node(
         package='ros_gz_sim',
         executable='create',
         arguments=[
             '-topic', 'robot_description',
-            '-entity', 'spider',
+            '-entity', 'inspector',
             '-x', '0.0',
             '-y', '0.0', 
             '-z', '1.0',
@@ -63,8 +55,7 @@ def generate_launch_description():
         output='screen'
     )
 
-
-    bridge_params = os.path.join(get_package_share_directory('spider_gazebo'),'config','gz_bridge.yaml')
+    bridge_params = os.path.join(get_package_share_directory('inspector_gazebo'),'config','gz_bridge.yaml')
     ros_gz_bridge = Node(
         package="ros_gz_bridge",
         executable="parameter_bridge",
@@ -74,6 +65,7 @@ def generate_launch_description():
             f'config_file:={bridge_params}',
         ]
     )
+
     ros_gz_image_bridge = Node(
         package="ros_gz_image",
         executable="image_bridge",
@@ -113,7 +105,7 @@ def generate_launch_description():
         ),
 
         gazebo,
-      
+        robot_state_publisher,
         spawn_entity,
         ros_gz_bridge,
         activate_forward_command_controller,  # Нужно для активации контроллера из-за 

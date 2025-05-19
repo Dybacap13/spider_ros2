@@ -8,7 +8,7 @@
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <string>
 #include <vector>
-namespace spider_gazebo {
+namespace spider_gazebo_controllers {
 std::vector<std::string> names_coxa = {"joint_coxa_rr", "joint_coxa_rm",
                                        "joint_coxa_rf", "joint_coxa_lr",
                                        "joint_coxa_lm", "joint_coxa_lf"};
@@ -43,4 +43,4 @@ class GazeboControllers : public rclcpp::Node {
            rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr>
       publisher_joints_to_controller;
 };
-}  // namespace spider_gazebo
+}  // namespace spider_gazebo_controllers

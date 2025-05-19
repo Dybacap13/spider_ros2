@@ -1,7 +1,7 @@
 
 #include <controllers_gazebo.hpp>
 using namespace std::chrono_literals;
-namespace spider_gazebo {
+namespace spider_gazebo_controllers {
 GazeboControllers::GazeboControllers(rclcpp::NodeOptions options)
     : Node("spider_gazebo_controllers",
            options.allow_undeclared_parameters(true)
@@ -58,7 +58,7 @@ void GazeboControllers::publishGazeboControllers() {
   }
   std::this_thread::sleep_for(500ms);
 }
-}  // namespace spider_gazebo
+}  // namespace spider_gazebo_controllers
 
 #include "rclcpp_components/register_node_macro.hpp"
-RCLCPP_COMPONENTS_REGISTER_NODE(spider_gazebo::GazeboControllers)
+RCLCPP_COMPONENTS_REGISTER_NODE(spider_gazebo_controllers::GazeboControllers)

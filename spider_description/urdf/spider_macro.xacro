@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="spider">
+<xacro:macro name="spider_macro" params="path_meshes format_meshes_stl">
+    
+    <xacro:property name="format_meshes_stl_" value="${format_meshes_stl}"/>
+
+    <!-- <xacro:arg name="path_meshes"  default="package://spider_description/meshes"/>
+    <xacro:arg name="format_meshes_stl"  default="True"/> -->
+
+    <xacro:if value="${format_meshes_stl_}">
+        <xacro:property name="format" value=".STL"/>
+    </xacro:if>
+    <xacro:unless value="${format_meshes_stl_}">
+        <xacro:property name="format" value=".dae"/>
+    </xacro:unless>
+
 
     <!-- Link properties -->
     <!-- <xacro:property name="pi" value="3.1415926535897931"/> -->
@@ -31,7 +45,8 @@
         <visual>
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
             <geometry>
-                <mesh filename="package://spider_description/meshes/base_link.STL" />
+                <!-- <mesh filename="package://spider_description/meshes/base_link.STL" /> -->
+                <mesh filename="${path_meshes}/base_link${format}" />
             </geometry>
             <material name="">
                 <color rgba="0.7 0.7 0.7 1"/>
@@ -40,7 +55,8 @@
         <collision>
             <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
             <geometry>
-                <mesh filename="package://spider_description/meshes/base_link.STL" />
+                <!-- <mesh filename="package://spider_description/meshes/base_link.STL" /> -->
+                <mesh filename="${path_meshes}/base_link${format}" />
             </geometry>
             <material name="">
                 <color rgba="0.7 0.7 0.7 1"/>
@@ -96,7 +112,8 @@
            <visual>
                <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
                <geometry>
-                   <mesh filename="package://spider_description/meshes/coxa_link.STL"/>
+                    <!-- <mesh filename="package://spider_description/meshes/coxa_link.STL"/> -->
+                    <mesh filename="${path_meshes}/coxa_link${format}" />
                </geometry>
                <material name="">
                    <color rgba="0.7 0.7 0.7 1"/>
@@ -105,7 +122,8 @@
            <collision>
                <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
                <geometry>
-                   <mesh filename="package://spider_description/meshes/coxa_link.STL"/>
+                   <!-- <mesh filename="package://spider_description/meshes/coxa_link.STL"/> -->
+                   <mesh filename="${path_meshes}/coxa_link${format}" />
                </geometry>
                <material name="">
                    <color rgba="0.7 0.7 0.7 1" />
@@ -140,7 +158,8 @@
             <visual>
                 <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
                 <geometry>
-                    <mesh filename="package://spider_description/meshes/2.STL"/>
+                    <!-- <mesh filename="package://spider_description/meshes/2.STL"/> -->
+                    <mesh filename="${path_meshes}/2${format}" />
                 </geometry>
                 <material name="">
                     <color rgba="0.7 0.7 0.7 1"/>
@@ -149,7 +168,8 @@
             <collision>
                 <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
                 <geometry>
-                    <mesh filename="package://spider_description/meshes/2.STL"/>
+                    <!-- <mesh filename="package://spider_description/meshes/2.STL"/> -->
+                    <mesh filename="${path_meshes}/2${format}" />
                 </geometry>
                 <material name="">
                     <color rgba="0.7 0.7 0.7 1" />
@@ -184,7 +204,8 @@
             <visual>
                 <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
                 <geometry>
-                    <mesh filename="package://spider_description/meshes/tibia_link.STL"/>
+                    <!-- <mesh filename="package://spider_description/meshes/tibia_link.STL"/> -->
+                    <mesh filename="${path_meshes}/tibia_link${format}" />
                 </geometry>
                 <material name="">
                     <color rgba="0.7 0.7 0.7 1"/>
@@ -193,7 +214,8 @@
             <collision>
                 <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
                 <geometry>
-                    <mesh filename="package://spider_description/meshes/tibia_link.STL"/>
+                    <!-- <mesh filename="package://spider_description/meshes/tibia_link.STL"/> -->
+                    <mesh filename="${path_meshes}/tibia_link${format}" />
                 </geometry>
                 <material name="">
                     <color rgba="0.7 0.7 0.7 1" />
@@ -245,5 +267,5 @@
 <xacro:leg side="l" position="m" x="0.0" y="0.1325" angle="${pi/2}" axis_femur="1" axis_tibia="1" axis_coxa="1" mass="0.0207333939617734"/>
 <xacro:leg side="l" position="f" x="0.170" y="0.110" angle="${pi/4}" axis_femur="1" axis_tibia="1" axis_coxa="1" mass="0.04073339396177341"/>
 
-
+</xacro:macro>
 </robot>
