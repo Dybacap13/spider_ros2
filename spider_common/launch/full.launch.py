@@ -423,7 +423,7 @@ def generate_launch_description():
   control_node_start.append(container_gazebo)
   control_node_start.append(spawn_entity)
   control_node_start.append(gazebo)
-  control_node_start.append(ros_gz_bridge)
+ # control_node_start.append(ros_gz_bridge)
   
 
 
