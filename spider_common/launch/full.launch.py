@@ -262,6 +262,7 @@ def generate_launch_description():
               package="controller_manager",
               executable="ros2_control_node",
               parameters=[ {'robot_description': robot_description_content},
+                           {"use_sim_time": True},
                           robot_controllers
                            
               ],
@@ -383,7 +384,7 @@ def generate_launch_description():
   delay_joint_state_broadcaster_spawner_after_ros2_control_node = (
             RegisterEventHandler(
                 event_handler=OnProcessStart(
-                    target_action=control_node,
+                    target_action=robot_state_pub_node,
                     on_start=[
                         TimerAction(
                             period=2.0,
@@ -416,11 +417,11 @@ def generate_launch_description():
 
   control_node_start = []
   control_node_start.append(robot_state_pub_node)
-  control_node_start.append(control_node)
+#   control_node_start.append(control_node)
   control_node_start.append(rviz_node)
   control_node_start.append(delay_joint_state_broadcaster_spawner_after_ros2_control_node)
   control_node_start.append(container_parametrs)
-  control_node_start.append(container_gazebo)
+#   control_node_start.append(container_gazebo)
   control_node_start.append(spawn_entity)
   control_node_start.append(gazebo)
  # control_node_start.append(ros_gz_bridge)

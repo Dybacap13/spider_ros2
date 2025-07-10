@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="inspector">
+
+
+  <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
+  <xacro:arg name="path_meshes" default="file://$(find spider_description)/meshes" />
+  <xacro:arg name="format_meshes_stl" default="False" />
+
+
+    <!-- Inspector description -->
+  <xacro:include filename="$(find spider_description)/urdf/spider_macro.xacro" />
+  <xacro:spider_macro path_meshes="$(arg path_meshes)" format_meshes_stl="$(arg format_meshes_stl)"/>
+
+
+
+
+
+
+
+
+
+    <!-- Ros2 control -->
+     <xacro:include filename="$(find spider_gazebo)/urdf/ros2_control.xacro" />
+  <xacro:spider_ros2_control name="SpiderHardwareInterface" initial_positions_file="$(arg initial_positions_file)"/>
+
+   
+
+</robot>
